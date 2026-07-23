@@ -110,6 +110,10 @@ delete the rest. (Examples in the README show a Node/Angular and a Flutter fill.
 - Format:
 - Benchmark / profile (for optimization work):
 
+**Test baseline** — what a healthy run looks like, so agents can tell new breakage
+from pre-existing breakage:
+- Baseline: <e.g. "all tests pass" — or list known-failing tests accepted as-is>
+
 ## Component libraries
 Which shared UI/component library this project uses. **Default: none.**
 

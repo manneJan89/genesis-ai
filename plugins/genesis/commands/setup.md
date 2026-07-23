@@ -37,7 +37,50 @@ not assume a Genesis component kit is wanted. Only name a shared library here if
 it's already a dependency or I explicitly ask for it. This keeps the project's
 code independent of any component package.
 
-## 3. Write the files
+## 3. Test infrastructure (blocking — do not skip)
+The whole workflow shells out to this project's test command: the test-writer, the
+acceptance gate, the fix loop, and the characterization safety net all depend on a
+runner that actually works. Establish it now.
+
+Detect what exists: a test framework in the dependencies, a test directory, runner
+config, and whether any tests are actually present. Then handle the case:
+
+**(a) No test infrastructure at all**
+Tell me plainly that this is a prerequisite, not a nice-to-have, and that without
+it the safety-net phases can't function. Propose the standard framework for this
+stack and exactly what you'd add. **Ask before installing anything** — per the
+project Standards, never add a dependency unilaterally. On approval:
+- add the test dependencies (dev/test scope),
+- create the test directory following the stack's convention,
+- write ONE trivial smoke test (assert something always true),
+- **run it and show me it passes.**
+The smoke test exists to prove the runner is wired up. A test command that has
+never been executed successfully is not set up. If it fails, fix the wiring before
+continuing — don't record a command you haven't seen work.
+
+**(b) Framework present but no tests written**
+Verify the runner actually executes (write and run the smoke test as above). Note
+that existing code has no coverage.
+
+**(c) Tests exist and pass**
+Run them once to confirm and record the green baseline.
+
+**(d) Tests exist but some FAIL**
+Do not treat this as fine and do not try to fix them here. Report which fail, and
+flag that a red baseline blocks the workflow: the e2e-tester can't tell new
+breakage from pre-existing breakage, so the fix loop has no reliable signal. Ask
+whether to (i) fix them first via `/genesis:fix`, or (ii) record the known-failing
+tests in CLAUDE.md as an accepted baseline so later phases can distinguish them.
+
+Also note lint/format tooling if absent, but treat that as optional — only the
+test runner is blocking.
+
+Finally: if this is an **existing codebase with little or no test coverage**, tell
+me that `/genesis:improve-feature`'s characterization tests become especially
+important here — they're the only thing that will make changing this code safe,
+and they'll take longer to establish on the first few features.
+
+## 4. Write the files
 Use the bundled templates (do not invent structure):
 - `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.template.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/spec-template.md`
@@ -52,7 +95,7 @@ Then:
     existing file or write them to a separate `CLAUDE.genesis.md` that the main
     file can reference. Wait for my choice.
 
-## 4. Confirm and hand off
+## 5. Confirm and hand off
 Show me the final CLAUDE.md, then tell me the available commands:
 - `/genesis:spec <feature>` → `/genesis:build-feature specs/<name>.md`  (new feature)
 - `/genesis:audit-feature <thing>` → `/genesis:improve-feature specs/<name>.md`  (change existing)
