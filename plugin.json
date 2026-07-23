@@ -1,0 +1,19 @@
+{
+  "name": "genesis",
+  "owner": {
+    "name": "YOUR_NAME"
+  },
+  "metadata": {
+    "description": "Genesis — a personal toolkit for starting and building projects with Claude Code.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "genesis",
+      "source": "./plugins/genesis",
+      "description": "Spec-driven workflow: build, change, and optimize features behind a test safety net. Stack-agnostic. Run /genesis:setup once per project.",
+      "category": "workflow",
+      "keywords": ["workflow", "spec-driven", "testing", "agents"]
+    }
+  ]
+}
