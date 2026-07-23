@@ -57,6 +57,20 @@ Check the spec's performance budget. If one exists, verify it with a concrete
 measurement (a benchmark, a timed run, a load test — whatever fits). Report the
 numbers against the target. If no budget was specified, say so and move on.
 
-## Phase 7 — Summary
+## Phase 7 — Update the roadmap (if any)
+If the spec header names a roadmap (`Roadmap: specs/roadmaps/<name>.md (slice N …)`),
+open that roadmap and:
+- mark this slice `done`,
+- fill in its Spec column with a relative link to the spec,
+- move **Next up** to the first remaining non-done slice,
+- update Last updated.
+
+If a shared decision changed during this build (schema, enum, side-effect rule),
+update the roadmap's Shared foundations too and tell me what changed — later
+slices depend on it. Do NOT rewrite older specs; they are point-in-time history.
+
+If the spec names no roadmap, skip this phase.
+
+## Phase 8 — Summary
 Report: what was built, which acceptance criteria now pass, test results,
 performance numbers, and anything left open or descoped.

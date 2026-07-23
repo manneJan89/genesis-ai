@@ -55,7 +55,21 @@ blocker rather than working around the spec.
 Verify the spec's performance budget with a real measurement. For refactors aimed
 at performance, report before-vs-after numbers. If no budget, say so.
 
-## Phase 8 — Summary
+## Phase 8 — Update the roadmap (if any)
+If the spec header names a roadmap (`Roadmap: specs/roadmaps/<name>.md (slice N …)`),
+open that roadmap and:
+- mark this slice `done`,
+- fill in its Spec column with a relative link to the spec,
+- move **Next up** to the first remaining non-done slice,
+- update Last updated.
+
+If a shared decision changed during this build (schema, enum, side-effect rule),
+update the roadmap's Shared foundations too and tell me what changed — later
+slices depend on it. Do NOT rewrite older specs; they are point-in-time history.
+
+If the spec names no roadmap, skip this phase.
+
+## Phase 9 — Summary
 Report: what changed, which characterization tests were kept vs updated (and why),
 new acceptance criteria now passing, full test results, performance numbers, and
 anything left open or descoped.

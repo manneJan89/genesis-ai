@@ -1,6 +1,7 @@
 # Spec: <feature name>
 
 Status: draft | approved
+Roadmap: <specs/roadmaps/<name>.md (slice N — <slice-name>)>, or omit if standalone
 Change type: new | refactor | extend | bugfix   <!-- drives how tests are handled -->
 Owner:
 Date:

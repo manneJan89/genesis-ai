@@ -50,7 +50,11 @@ reference and worked examples.
 | I want to… | Run |
 |---|---|
 | Set up Genesis in a project (once) | `/genesis:setup` |
+| Plan a whole system (multi-slice) | `/genesis:roadmap <system>` |
+| See where I left off | `/genesis:roadmap` (no arguments) |
 | Build something new | `/genesis:spec <feature>` → `/genesis:build-feature specs/<name>.md` |
+| Find out what's wrong with existing code | `/genesis:review <thing>` |
+| Fix a reported bug | `/genesis:fix <what's broken>` |
 | Understand existing code | `/genesis:audit-feature <thing>` |
 | Change / extend existing code | `/genesis:audit-feature <thing>` → `/genesis:improve-feature specs/<name>.md` |
 | Make working code faster | `/genesis:audit-feature <thing>` (type=refactor) → `/genesis:optimize-feature specs/<name>.md` |

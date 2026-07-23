@@ -42,11 +42,13 @@ Start from what you're trying to do:
 | I want to… | Run | What you get |
 |---|---|---|
 | Set up genesis in a project (once) | `/genesis:setup` | Writes `CLAUDE.md` (stack + rules) and `specs/_TEMPLATE.md` |
+| Plan a whole system (multi-slice) | `/genesis:roadmap <system>` | A thin plan + ordered slices, each ready to spec |
 | Build something that doesn't exist yet | `/genesis:spec <feature>` | An interview, then `specs/<name>.md` for you to approve |
 | …then actually build it | `/genesis:build-feature specs/<name>.md` | Working code + tests, all acceptance criteria passing |
 | Understand / document existing code | `/genesis:audit-feature <thing>` | `specs/<name>.md` describing what the code does *today*, with gaps and bugs flagged |
 | Change or extend existing code | `/genesis:audit-feature <thing>` → `/genesis:improve-feature specs/<name>.md` | The change, behind a characterization net that proves nothing else broke |
-| Fix a bug in existing code | same pair (set Change type = `bugfix`) | Correct behavior + a regression test |
+| Find out what's wrong (don't know yet) | `/genesis:review <thing>` | A ranked list of real defects, perf hypotheses, and standards violations — each routed to the right command |
+| Fix a reported bug | `/genesis:fix <what's broken>` | A failing test that reproduces it, a minimal fix, and that test left behind as a regression guard |
 | Make working code faster | `/genesis:audit-feature <thing>` (Change type = `refactor`) → `/genesis:optimize-feature specs/<name>.md` | Measured before/after numbers, behavior provably unchanged |
 
 Rules of thumb:
@@ -60,6 +62,10 @@ Rules of thumb:
 - `/genesis:setup` — infers your stack (or asks) and writes the project's `CLAUDE.md`
   + spec template. Re-run when the stack changes. Won't overwrite an existing
   CLAUDE.md without asking.
+- `/genesis:roadmap <system>` — interview-driven planning for a system too big for
+  one spec: settles cross-cutting decisions (schema, enums, side effects, failure
+  semantics, permissions) and breaks it into ordered slices. Run with no arguments
+  to see where you left off. Optional — single features don't need one.
 - `/genesis:spec <feature>` — interactive interview for a NEW feature; writes an
   approved spec. Writes no code.
 - `/genesis:build-feature specs/<name>.md` — plan (you approve) → build → unit tests
@@ -68,6 +74,11 @@ Rules of thumb:
 - `/genesis:audit-feature <thing>` — reads EXISTING code, reverse-engineers what it
   does today, flags gaps/bugs, interviews you on the target, tags each behavior
   Keep/Change/Wrong. Writes no code.
+- `/genesis:review <thing>` — read-only inspection for bugs, performance risks,
+  standards violations, and coverage gaps. Reports and routes; changes nothing.
+- `/genesis:fix <bug>` — capture the report → investigate (read-only) → **reproduce
+  with a failing test** → minimal fix (bug-fixer) → verify the full suite → check
+  whether the same bug exists elsewhere. Won't fix what it can't reproduce.
 - `/genesis:improve-feature specs/<name>.md` — characterization net first → plan (you
   approve) → change → tests → acceptance → fix loop → perf → summary.
 - `/genesis:optimize-feature specs/<name>.md` — baseline + profile → safety net →

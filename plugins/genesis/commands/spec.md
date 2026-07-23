@@ -11,6 +11,24 @@ delegate it to a subagent (subagents can't interview me).
 
 Follow the template at @specs/_TEMPLATE.md.
 
+## 0. Check for a roadmap (before interviewing)
+Glob `specs/roadmaps/*.md` and look for a slice matching $ARGUMENTS.
+
+- **Exactly one match** — say so plainly ("This is slice N of the <name> roadmap"),
+  list the shared decisions it must respect (data shape, enums, cross-cutting
+  flags, side-effect rules, failure semantics, reused components), and treat those
+  as **fixed constraints** — do not re-open them in the interview. Record the
+  back-link in the spec header:
+  `Roadmap: specs/roadmaps/<name>.md (slice N — <slice-name>)`
+  Mark that slice `in progress` in the roadmap.
+- **No match** — proceed standalone. A roadmap is optional; most one-off features
+  don't need one.
+- **Ambiguous / fuzzy match** — ask which roadmap and slice I mean. Don't guess.
+
+If the request is clearly a whole system rather than one feature (it would need
+several specs, or the interview keeps expanding in scope), stop and recommend
+`/genesis:roadmap <system>` instead of writing a mega-spec.
+
 ## Your job
 
 1. **Interview me to extract the real requirement.** Ask focused questions
