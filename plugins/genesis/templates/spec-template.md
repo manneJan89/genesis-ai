@@ -42,6 +42,13 @@ outcome. This is what the test-writer and e2e-tester work from, so be precise.
 - [ ] Edge case: ...
 - [ ] Error case: ...
 
+## UI / design — features with a UI only
+- **Design source**: <inherited from roadmap | existing design system | repo file
+  (path) | external ref (Figma/Claude Design) | own initiative | invented>
+- **Reused components**: <existing components this screen uses>
+- **New UI conventions** (only if inventing): <spacing, colour, type choices made>
+- Leave this section out for non-UI features.
+
 ## Performance budget
 Measurable targets, or "none required".
 - e.g. p95 response < 200ms under 50 concurrent requests

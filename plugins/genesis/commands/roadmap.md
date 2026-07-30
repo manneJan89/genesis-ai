@@ -58,6 +58,24 @@ Cover at least:
   exist in the schema from slice one because later reads depend on it.
 - **Permissions** — who may do each operation.
 - **Cost** — expected volumes, and whether any read pattern grows unbounded.
+- **Design source** — how UI should be produced across this system. Establish it
+  once here so every slice inherits it. Resolve in this order and record the
+  outcome under Shared foundations:
+  1. **Existing design system in the codebase** — theme, design tokens, a shared
+     component library, established layout patterns. Detect these; if present, they
+     are the default and slices conform to them.
+  2. **A design file/export in the repo** — mockups, a style guide, exported specs.
+     Name the path.
+  3. **An external reference I point you at** — e.g. a Figma file (note: you can
+     only read it if the Figma MCP connector is set up — if the design lives there
+     and it isn't connected, tell me to connect it rather than guessing), or a
+     design exported/pasted from Claude Design into the repo.
+  4. **Your own initiative, constrained** — if none of the above, build UI
+     consistent with whatever partial conventions exist (framework defaults, any
+     tokens found).
+  5. **Invent one (last resort)** — only if there's genuinely nothing to follow.
+     State the conventions you chose (spacing, colour, type scale) so they're
+     reviewable and can become the system.
 
 When I say I don't want something, ask whether I've **decided against it** or
 simply **hadn't considered it**. Record the two differently: a deliberate

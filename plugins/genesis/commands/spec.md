@@ -43,6 +43,21 @@ several specs, or the interview keeps expanding in scope), stop and recommend
    - What are the concrete acceptance criteria (including edge and error cases)?
    - Are there performance targets?
    - What existing code/constraints must this respect or avoid touching?
+   - **If this feature has UI:** how should it look? Resolve the design source
+     before proposing layout —
+     - If a roadmap set a **Design source**, inherit it; don't re-decide. Conform
+       this screen to that system.
+     - Otherwise, in order: an existing design system/tokens/components in the
+       codebase → a design file or mockup in the repo (name the path) → an external
+       reference I give you (a Figma file needs the Figma MCP connector to be
+       readable — if it's not connected, say so; or a design exported from Claude
+       Design into the repo) → your own initiative matching existing conventions →
+       as a last resort, propose a layout and state the visual conventions you
+       chose so I can approve them.
+     Reuse existing components before building new ones (DRY), and respect the
+     project's **Component libraries** setting — don't pull in an un-opted-in
+     library. Record the chosen design source and any new UI conventions in the
+     spec.
 
 2. **Push back and improve the idea.** If something is vague, contradictory,
    over-scoped, or missing an obvious edge case, say so and propose a sharper

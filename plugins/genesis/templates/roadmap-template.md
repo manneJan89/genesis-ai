@@ -20,6 +20,9 @@ Decisions that span slices. **Slice 1 commits these** — later slices inherit t
 - **Cross-cutting flags**: <e.g. soft delete via `deletedAt`; ALL reads exclude
   deleted by default — must exist from slice 1>
 - **Permissions**: <who may do what>
+- **Design source**: <existing design system | repo design file (path) | external
+  ref (Figma — needs MCP connector / Claude Design export) | own initiative from
+  existing conventions | invented (list the conventions chosen)>
 - **Failure semantics**: <what happens when the main write succeeds but a side
   effect fails>
 
