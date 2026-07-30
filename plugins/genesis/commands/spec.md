@@ -21,6 +21,10 @@ Glob `specs/roadmaps/*.md` and look for a slice matching $ARGUMENTS.
   back-link in the spec header:
   `Roadmap: specs/roadmaps/<name>.md (slice N — <slice-name>)`
   Mark that slice `in progress` in the roadmap.
+  Also read the roadmap's **Decisions** — treat them as settled rationale, not open
+  questions. If this slice would contradict a recorded decision, flag it to me
+  explicitly rather than silently going along; that's a decision to revisit at the
+  roadmap level, not to quietly override in a slice spec.
 - **No match** — proceed standalone. A roadmap is optional; most one-off features
   don't need one.
 - **Ambiguous / fuzzy match** — ask which roadmap and slice I mean. Don't guess.

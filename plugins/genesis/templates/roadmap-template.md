@@ -55,6 +55,20 @@ Things an early slice must include for a later one to work.
 - <e.g. `deletedAt` exists from slice 1 so list views filter correctly before
   delete ships>
 
+## Decisions (why, not just what)
+The reasoning behind the cross-cutting choices above — so a later session can tell
+a deliberate decision from an arbitrary one, and doesn't reopen settled ground.
+One short entry per non-obvious decision. Append as new ones are made; don't
+rewrite old ones (if a decision is reversed, add a new entry that supersedes it).
+
+### D1 — <the decision, one line>
+- **Why**: the reason it was chosen.
+- **Alternatives rejected**: what else was considered, and why not.
+- **Revisit if**: the condition that would reopen this (or "stable").
+
+### D2 — <…>
+(repeat)
+
 ## Deliberately not doing
 Excluded on purpose, with the reason — so it isn't re-litigated in every slice
 interview. (Distinct from "not thought of yet", which becomes a slice.)

@@ -7,9 +7,19 @@
   },
   "repository": "https://github.com/YOUR_GITHUB_USERNAME/genesis",
   "license": "MIT",
-  "keywords": ["workflow", "spec-driven", "testing", "agents", "tdd"],
+  "keywords": [
+    "workflow",
+    "spec-driven",
+    "testing",
+    "agents",
+    "tdd"
+  ],
   "components": {
-    "commands": ["commands/"],
-    "agents": ["agents/"]
+    "commands": [
+      "commands/"
+    ],
+    "agents": [
+      "agents/"
+    ]
   }
 }

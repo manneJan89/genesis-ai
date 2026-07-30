@@ -64,6 +64,13 @@ simply **hadn't considered it**. Record the two differently: a deliberate
 exclusion goes under "Deliberately not doing" **with its reason**, so it isn't
 re-litigated in every slice interview.
 
+For each **non-obvious cross-cutting decision** we settle (a schema choice, an
+enum's value set, a side-effect rule, a failure policy), capture a short
+**Decision** entry: what was chosen, *why*, and the alternatives we rejected and
+why not. This is the part that stops a future session from reopening settled
+ground or mistaking a deliberate call for an arbitrary one. Offer a recommended
+answer with each question and let me override it — record which way it went.
+
 ## 3. Propose the slicing
 Propose an ordered set of slices and explain the ordering. Rules:
 - Cut **vertically** — each slice should be a thin end-to-end path that is
