@@ -57,6 +57,13 @@ Cover at least:
 - **Cross-cutting flags** — anything (soft delete, tenancy, archiving) that must
   exist in the schema from slice one because later reads depend on it.
 - **Permissions** — who may do each operation.
+- **Security model** — the system-wide decisions: how callers authenticate, the
+  authorization model (roles? per-resource ownership?), which endpoints are public
+  vs private, where the trust boundary is, and where secrets/config live. Settle
+  this once so every slice inherits it instead of re-deciding per endpoint.
+- **Scale shape** — expected data volumes and growth; which entities need
+  pagination and indexing from the start. Anything that must be built to scale in
+  slice one because retrofitting it later is costly.
 - **Cost** — expected volumes, and whether any read pattern grows unbounded.
 - **Design source** — how UI should be produced across this system. Establish it
   once here so every slice inherits it. Resolve in this order and record the

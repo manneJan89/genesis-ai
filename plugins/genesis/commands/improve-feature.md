@@ -48,6 +48,12 @@ whole feature. Repeat until everything is green — including the untouched
 characterization tests, which guard against regressions. Stop and report any
 blocker rather than working around the spec.
 
+**Cap the loop at 3 fix cycles.** If it's not green after three passes, stop and
+report what's still failing and your best hypothesis rather than regenerating the
+change again. If a characterization test keeps failing, check whether it was a
+Keep behavior that this change legitimately alters (update the test) versus a real
+regression (fix the code) — don't loop blindly on it.
+
 > For a hands-off loop: `/goal the full suite passes, the Keep characterization
 > tests still pass, and the target acceptance criteria in <spec> are met`.
 

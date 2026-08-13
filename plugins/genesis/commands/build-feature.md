@@ -48,6 +48,12 @@ whole feature. Repeat until the suite is green against every acceptance criterio
 or until you hit a blocker you can't resolve — in which case stop and report it
 rather than hacking around the spec.
 
+**Cap the loop at 3 fix cycles.** If it's not green after three build→test→fix
+passes, stop and report what's still failing, your best hypothesis, and what you'd
+try next — do not keep regenerating code. Repeated failure usually means the spec
+or the approach is wrong, not that another cycle will fix it, and each cycle
+re-emits the whole change. Getting my input is cheaper than a fourth blind pass.
+
 > Tip: for a hands-off version of this loop, I can instead run
 > `/goal all tests pass and the acceptance criteria in <spec> are met`
 > and let Claude iterate build → test → fix → re-test on its own.

@@ -49,6 +49,14 @@ outcome. This is what the test-writer and e2e-tester work from, so be precise.
 - **New UI conventions** (only if inventing): <spacing, colour, type choices made>
 - Leave this section out for non-UI features.
 
+## Security — features touching endpoints, data, or user input
+- **Access**: public | authenticated (which roles / ownership rule)
+- **Authorization**: per-resource check (can user A act on B's data?) — how enforced
+- **Server-side validation**: what's validated/sanitized at the boundary (never
+  trust the client)
+- **Secrets/config**: what comes from env (never hardcoded)
+- Omit only for features with genuinely no security surface (pure UI, no data).
+
 ## Performance budget
 Measurable targets, or "none required".
 - e.g. p95 response < 200ms under 50 concurrent requests

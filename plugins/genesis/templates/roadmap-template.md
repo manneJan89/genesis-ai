@@ -20,6 +20,11 @@ Decisions that span slices. **Slice 1 commits these** — later slices inherit t
 - **Cross-cutting flags**: <e.g. soft delete via `deletedAt`; ALL reads exclude
   deleted by default — must exist from slice 1>
 - **Permissions**: <who may do what>
+- **Security model**: <how callers authenticate; authorization model (roles /
+  per-resource ownership); public vs private endpoints; where the trust boundary
+  is; where secrets/config live>
+- **Scale shape**: <expected volumes/growth; which entities need pagination +
+  indexing from slice 1>
 - **Design source**: <existing design system | repo design file (path) | external
   ref (Figma — needs MCP connector / Claude Design export) | own initiative from
   existing conventions | invented (list the conventions chosen)>

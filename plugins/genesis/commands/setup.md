@@ -75,6 +75,28 @@ tests in CLAUDE.md as an accepted baseline so later phases can distinguish them.
 Also note lint/format tooling if absent, but treat that as optional — only the
 test runner is blocking.
 
+**Secrets hygiene (quick check).** Verify there's a `.gitignore` that excludes
+env/secret files (`.env`, `*.key`, service-account JSON, `google-services.json`
+where appropriate). If secrets appear to be committed or unignored, flag it —
+this is a security issue per the project Standards. Add the ignore entries (with
+my okay); do not delete committed secrets automatically, just report them so I can
+rotate and purge them.
+
+**Logging.** Establish where failures get logged, and fill the Logging section of
+CLAUDE.md. **Do not provision or install any monitoring service** (Sentry,
+Crashlytics) — that's a paid/metered dependency and a deliberate feature, not a
+setup side-effect.
+- Detect an existing log sink or logger in the dependencies. If one exists, record
+  it as the destination.
+- If none, set the **default**: a thin **logger abstraction** (one small file/
+  module) that wraps the language's built-in console/stdout logging. Note its
+  intended path in CLAUDE.md. Code will log through it, never directly — so a real
+  sink can be swapped in later with a one-file change. Offer to create the
+  abstraction stub now (with my okay).
+- Ask how the project distinguishes **environments** (dev vs prod) and fill the
+  level/destination matrix. If unknown, default to dev=debug/console,
+  prod=warn+error/console until a sink is added.
+
 Finally: if this is an **existing codebase with little or no test coverage**, tell
 me that `/genesis:improve-feature`'s characterization tests become especially
 important here — they're the only thing that will make changing this code safe,

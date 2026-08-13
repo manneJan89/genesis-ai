@@ -2,7 +2,7 @@
 name: characterization-tester
 description: Writes characterization tests that pin down an existing feature's CURRENT behavior as a regression safety net, before any refactor or change. Use after an audit spec exists and before modifying existing code.
 tools: Read, Grep, Glob, Write, Edit, Bash
-model: sonnet
+model: haiku
 ---
 
 You write **characterization tests** — a safety net that captures how existing

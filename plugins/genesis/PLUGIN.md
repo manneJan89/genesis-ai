@@ -48,6 +48,7 @@ Start from what you're trying to do:
 | Understand / document existing code | `/genesis:audit-feature <thing>` | `specs/<name>.md` describing what the code does *today*, with gaps and bugs flagged |
 | Change or extend existing code | `/genesis:audit-feature <thing>` → `/genesis:improve-feature specs/<name>.md` | The change, behind a characterization net that proves nothing else broke |
 | Find out what's wrong (don't know yet) | `/genesis:review <thing>` | A ranked list of real defects, perf hypotheses, and standards violations — each routed to the right command |
+| Audit security across the app | `/genesis:security-check [scope]` | Attacker's-eye, checklist-driven vulnerability report routed to `/genesis:fix` |
 | Fix a reported bug | `/genesis:fix <what's broken>` | A failing test that reproduces it, a minimal fix, and that test left behind as a regression guard |
 | Make working code faster | `/genesis:audit-feature <thing>` (Change type = `refactor`) → `/genesis:optimize-feature specs/<name>.md` | Measured before/after numbers, behavior provably unchanged |
 
@@ -76,6 +77,11 @@ Rules of thumb:
   Keep/Change/Wrong. Writes no code.
 - `/genesis:review <thing>` — read-only inspection for bugs, performance risks,
   standards violations, and coverage gaps. Reports and routes; changes nothing.
+- `/genesis:security-check [scope]` — deliberate whole-surface security audit
+  (default: whole app). Maps every entry point, works a vulnerability checklist
+  (authn, authz/IDOR, injection, secrets, exposure, transport, abuse, deps),
+  reports and routes to `/genesis:fix`. Read-only. A structured self-review, not a
+  pentest — it says what it can't verify statically.
 - `/genesis:fix <bug>` — capture the report → investigate (read-only) → **reproduce
   with a failing test** → minimal fix (bug-fixer) → verify the full suite → check
   whether the same bug exists elsewhere. Won't fix what it can't reproduce.
@@ -84,6 +90,42 @@ Rules of thumb:
 - `/genesis:optimize-feature specs/<name>.md` — baseline + profile → safety net →
   hypothesis → ONE change → re-measure vs baseline (revert if it doesn't beat noise)
   → repeat → summary.
+
+## Getting Opus for planning, Sonnet for building
+The planning-heavy commands think better on a stronger model; the mechanical build
+work doesn't need it. Claude Code's `opusplan` gives you both — Opus while Plan
+Mode is on, Sonnet after — but it keys off **Plan Mode**, not off these commands'
+phases. So the model switch only happens if you toggle Plan Mode yourself.
+
+Recommended:
+1. `/model opusplan` (set it once as your default — press Enter in the picker).
+2. Before an interview/planning command — `/genesis:roadmap`, `/genesis:spec`,
+   `/genesis:audit-feature` — enter **Plan Mode** (Shift+Tab). It plans on Opus and,
+   as a bonus, is read-only so it can't write by accident.
+3. For `/genesis:build-feature` / `/genesis:improve-feature` / `/genesis:optimize-feature`,
+   stay in Plan Mode through the plan phase (Opus); approving the plan exits Plan
+   Mode and the build drops to Sonnet automatically.
+
+Revising a plan on a smarter model: a roadmap/spec is just markdown — enter Plan
+Mode (Opus) and ask Claude to pressure-test the existing file
+(`specs/roadmaps/<name>.md`). No special command needed; Plan Mode is read-only so
+it critiques without editing until you apply the changes.
+
+> Requires Opus access on your plan. If `opusplan` isn't in your `/model` picker,
+> everything runs on Sonnet regardless of Plan Mode — the workflow still works,
+> you just don't get the planning boost.
+
+### Keeping output-token cost down
+Most output cost is in **code generation and the test loops**, not planning or doc
+writing (a spec is a few KB). If your bill runs high:
+- The fix loops cap at **3 cycles** — a feature that won't go green is stopped and
+  reported rather than regenerating code indefinitely. Runaway loops are the #1
+  cost.
+- `e2e-tester` and `characterization-tester` run on **Haiku** and report tersely
+  (no pasted logs). The reasoning agents (`test-writer`, `bug-fixer`) stay on Sonnet.
+- **Smaller slices win**: a big feature that needs several fix cycles re-emits far
+  more than small slices that pass first try. Lean on roadmap slicing.
+- `/clear` between unrelated features so you're not re-processing stale context.
 
 ## Agents (used by the commands — you don't call these directly)
 test-writer · characterization-tester · perf-profiler · e2e-tester · bug-fixer.

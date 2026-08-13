@@ -49,6 +49,11 @@ Delegate to the **bug-fixer** subagent with the failing test and your hypothesis
 The fix must be **minimal** and address the root cause, not mask the symptom. No
 refactoring beyond what the fix requires; no scope creep.
 
+**Cap at 3 attempts.** If the reproducing test isn't green after three fix
+attempts, stop and report the failed hypotheses and what you've ruled out rather
+than trying more variations. A bug that resists three targeted fixes usually needs
+my input or more information, not another guess.
+
 ## Phase 4 — Verify
 - The new test now passes.
 - Run the **full suite** (command from CLAUDE.md) — everything else still passes.

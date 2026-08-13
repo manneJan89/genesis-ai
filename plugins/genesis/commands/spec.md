@@ -42,6 +42,14 @@ several specs, or the interview keeps expanding in scope), stop and recommend
    - What is explicitly out of scope?
    - What are the concrete acceptance criteria (including edge and error cases)?
    - Are there performance targets?
+   - **Security (any feature touching data, endpoints, or user input):** Is this
+     public or authenticated? Who is authorized — which roles/owners, and is it
+     per-resource (can user A act on user B's record)? What input crosses a trust
+     boundary, and what's the server-side validation for it? Any secrets/config
+     involved (must come from env, never hardcoded)? Default to requiring auth
+     unless I say it's genuinely public.
+   - **Scale:** expected volume for any list/query here — does it need pagination,
+     and are the filtered/sorted fields indexed?
    - What existing code/constraints must this respect or avoid touching?
    - **If this feature has UI:** how should it look? Resolve the design source
      before proposing layout —

@@ -27,18 +27,28 @@ Look for these, in priority order:
 1. **Correctness / likely bugs** — unhandled errors, ignored failure paths, race
    conditions, off-by-one, null/empty handling, incorrect edge-case behavior,
    state that can go stale, resource leaks (undisposed controllers, listeners,
-   subscriptions).
+   subscriptions). Also **silently swallowed errors** (empty catches, failures
+   with no log and no rethrow) and logging that bypasses the abstraction
+   (`print`/`console.log`/direct SDK calls) or logs secrets/PII.
 2. **Performance & cost risks** — N+1 access, work inside loops that could be
    hoisted, unbounded growth, quadratic behavior, redundant network/DB calls,
    missing caching, unnecessary rebuilds/renders, and (per Standards) extra
-   billable operations against metered services.
-3. **Standards violations** — measured against CLAUDE.md, not preference:
+   billable operations against metered services. Also scale risks: unpaginated
+   list queries, filters/sorts on unindexed fields, whole-collection reads.
+3. **Security** — per the Standards, a first-pass smell check on the code in
+   scope: private endpoints missing auth or per-resource authorization checks;
+   input trusted without server-side validation/sanitization; string-built queries
+   (injection risk); secrets or credentials hardcoded or logged; errors leaking
+   internals; anything that fails open instead of closed. For a deliberate
+   whole-surface audit (attacker's-eye, full checklist), route to
+   `/genesis:security-check`.
+4. **Standards violations** — measured against CLAUDE.md, not preference:
    duplicated logic (DRY), over-clever abstractions with flag parameters (KISS),
    magic strings where an enum belongs, non-exhaustive branching over a fixed
    value set, dependencies or component libraries the project didn't opt into.
-4. **Test coverage gaps** — behavior with no test, especially error paths and
+5. **Test coverage gaps** — behavior with no test, especially error paths and
    edge cases. Name the specific missing case, not "needs more tests".
-5. **Maintainability risks** — functions doing too much, unclear naming, hidden
+6. **Maintainability risks** — functions doing too much, unclear naming, hidden
    coupling, anything that will make the next change dangerous.
 
 ## Rules for findings — follow these strictly

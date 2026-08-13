@@ -88,6 +88,60 @@ standards under Conventions below.
   one place. Exhaustive `switch` over an enum is preferred to if/else chains, so
   the compiler catches a missing case when a value is added later.
 
+- **Security is not optional and not a feature — it's a property of everything.**
+  - **The server is the only trust boundary.** Client-side validation is for UX;
+    it can always be bypassed. Every rule enforced on the client MUST be enforced
+    again on the server. Never trust input that arrived over the wire.
+  - **Auth on every private endpoint.** Private/authenticated endpoints verify the
+    caller's identity AND that they're authorized for *this* resource (an
+    authenticated user is not automatically permitted). Deny by default: an
+    endpoint with no explicit auth decision is treated as needing auth, not as
+    public. Return 401 vs 403 correctly and don't leak which.
+  - **Validate and sanitize all input, server-side.** Reject malformed input at
+    the boundary; validate type, range, length, and shape. Use parameterized
+    queries / the ORM's safe paths — never string-built queries. Encode/escape
+    output to prevent injection (SQL, XSS, command). Treat file uploads and
+    redirects as hostile until checked.
+  - **No secrets in source, ever.** API keys, tokens, connection strings, and
+    credentials come from environment/config (`.env`, platform secrets), which is
+    git-ignored. Never log secrets or PII. If a secret would appear in code,
+    output, or a commit, stop and flag it.
+  - **Least privilege.** Request the narrowest scopes/permissions that work;
+    don't run or connect as an admin/superuser for ordinary operations.
+  - **Fail closed.** On an auth or validation error, deny access — never fall
+    through to permitted. Don't expose stack traces or internal detail in errors
+    sent to clients.
+
+- **Log failures — through the abstraction, never raw, never secrets.**
+  - Log where a failure is **handled** (the catch that decides what happens), once
+    per failure — not at every layer it passes through. One meaningful entry, not
+    ten.
+  - **Never swallow errors silently.** An empty catch, or one that hides a failure
+    with no log and no rethrow, is a defect. Every caught failure is either
+    handled-and-logged or rethrown.
+  - Log through the project's **logger abstraction** (see CLAUDE.md → Logging),
+    never `print` / `console.log` / direct SDK calls. This is what lets the sink
+    and level change per environment from one place.
+  - Use **levels**: error (failed, needs attention) / warn (recovered or degraded)
+    / info (notable events) / debug (dev only). Production runs at warn/error.
+  - Include **actionable context** — the operation, relevant identifiers, the
+    error type/message — but **never secrets, tokens, credentials, or PII** (this
+    overrides the urge to "log everything to debug it"). Log an id, not the record.
+  - Internal detail (stack traces) goes to the log sink, **never to a client
+    response** (ties to the security standard).
+  performance/cost rules above, at the data layer specifically:
+  - **Never load unbounded result sets.** List/query endpoints paginate (limit +
+    cursor/offset); no "fetch all rows/documents" that grows with the table.
+  - Ensure queries are backed by an **index**; flag any filter/sort on an
+    unindexed field.
+  - Avoid N+1 access across a collection; batch or join.
+  - Don't hold whole collections in memory to filter in code — filter at the
+    query.
+  - Prefer stateless request handling (state in the data store, not the process)
+    so the service can run behind more than one instance.
+  - Flag any operation whose cost grows with total data size rather than with the
+    page being served.
+
 <!-- =================================================================== -->
 <!-- PER-PROJECT — FILL THIS IN  (the only section that changes per repo) -->
 <!-- =================================================================== -->
@@ -113,6 +167,25 @@ delete the rest. (Examples in the README show a Node/Angular and a Flutter fill.
 **Test baseline** — what a healthy run looks like, so agents can tell new breakage
 from pre-existing breakage:
 - Baseline: <e.g. "all tests pass" — or list known-failing tests accepted as-is>
+
+## Logging
+Where failures go, and how it varies by environment. Code logs through the
+abstraction below — never `print`/`console.log`/direct SDK calls.
+
+- **Logger abstraction**: <path, e.g. lib/core/logger.dart — the single seam all
+  logging goes through>
+- **Sink**: <console-only (default) | Sentry | Crashlytics | platform stdout | …>
+- **Environment switch**: <how prod vs dev is detected — NODE_ENV, --dart-define,
+  build flavor>
+
+| Environment | Min level | Destination | Stack traces |
+|---|---|---|---|
+| dev | debug | console | shown |
+| prod | warn/error | <sink> | to sink only, never to client |
+
+> Genesis does not provision monitoring services. To add one (Sentry, Crashlytics),
+> build it as a feature — `/genesis:spec add <service> error reporting` — so the
+> DSN-from-env, cost note, and init go through the normal approval gates.
 
 ## Component libraries
 Which shared UI/component library this project uses. **Default: none.**
