@@ -21,6 +21,9 @@ Glob `specs/roadmaps/*.md` and look for a slice matching $ARGUMENTS.
   back-link in the spec header:
   `Roadmap: specs/roadmaps/<name>.md (slice N — <slice-name>)`
   Mark that slice `in progress` in the roadmap.
+  Note the slice's `new`/`modify` type in the spec for context, but the build step
+  is always `/genesis:build-feature` — it detects and protects existing code
+  itself, so you don't switch commands for modify slices.
   Also read the roadmap's **Decisions** — treat them as settled rationale, not open
   questions. If this slice would contradict a recorded decision, flag it to me
   explicitly rather than silently going along; that's a decision to revisit at the
@@ -51,21 +54,44 @@ several specs, or the interview keeps expanding in scope), stop and recommend
    - **Scale:** expected volume for any list/query here — does it need pagination,
      and are the filtered/sorted fields indexed?
    - What existing code/constraints must this respect or avoid touching?
-   - **If this feature has UI:** how should it look? Resolve the design source
-     before proposing layout —
-     - If a roadmap set a **Design source**, inherit it; don't re-decide. Conform
-       this screen to that system.
-     - Otherwise, in order: an existing design system/tokens/components in the
-       codebase → a design file or mockup in the repo (name the path) → an external
-       reference I give you (a Figma file needs the Figma MCP connector to be
-       readable — if it's not connected, say so; or a design exported from Claude
-       Design into the repo) → your own initiative matching existing conventions →
-       as a last resort, propose a layout and state the visual conventions you
-       chose so I can approve them.
-     Reuse existing components before building new ones (DRY), and respect the
-     project's **Component libraries** setting — don't pull in an un-opted-in
-     library. Record the chosen design source and any new UI conventions in the
-     spec.
+   - **If this feature has UI, run the DESIGN GATE before finalizing the spec.**
+     (Skip entirely for backend/database/API/logic — no design needed there.)
+     1. If a roadmap set a **Design source**, inherit it.
+     2. Check the `design/` folder for a stored design for this screen:
+        - **Design exists and covers this feature** (e.g. the report-page design
+          already shows a search bar) → say so, reference it, proceed.
+        - **Design exists but doesn't cover this feature** → STOP and ask: "the
+          <screen> design doesn't include <feature> — will you update the design,
+          or should I assume it?"
+        - **No design exists** → STOP and ask: "there's no design for <screen> —
+          hand me one (image, HTML/CSS, or Claude Design export), or should I
+          assume it?"
+     3. **Only if I say assume:** design it FIRST, before any build. Produce a
+        human-editable HTML/CSS file into `design/` (see the editable-design rule)
+        and **get my approval of the design as part of approving the spec.** No
+        code is written until the look is signed off — design precedes build.
+     Reuse existing components before designing new ones (DRY), and respect the
+     project's **Component libraries** setting. Record the resolved design source in
+     the spec's UI/design section. The spec is not `approved` until the design gate
+     is resolved (design in hand/approved, or explicitly deferred by me).
+
+     **Editable-design rule** — anything written to `design/` MUST be hand-editable
+     by a non-LLM human:
+     - one self-contained `.html` file, styles in a `<style>` block, no external
+       sheet, not minified, indented;
+     - semantic shallow structure (`<header>`, `<nav>`, `<button>`), not deep
+       `<div>` nesting;
+     - commented sections (`<!-- Search bar -->`, `<!-- Results -->`);
+     - colours/spacing/type as CSS variables at the top so one edit changes many;
+     - a short header comment explaining how to edit it.
+     Test it must pass: I can open it, change a colour and a position, save, refresh,
+     and see the change — no LLM involved. Hand HTML/CSS or a Claude Design export →
+     store in `design/` as-is (tidy to meet the rule). Hand an image → generate the
+     editable HTML/CSS from it. (This conversion is exactly what `/genesis:design`
+     does — you may run its logic inline here, or tell me to run `/genesis:design`
+     first if I'd rather iterate on the look before speccing.) When this design is
+     later coded into the app, use the **project's** styling system
+     (Tailwind/Bootstrap/theme), NOT the design's raw CSS; minor pixel drift is fine.
 
 2. **Push back and improve the idea.** If something is vague, contradictory,
    over-scoped, or missing an obvious edge case, say so and propose a sharper
@@ -80,7 +106,10 @@ several specs, or the interview keeps expanding in scope), stop and recommend
    "Open questions" rather than guessing.
 
 5. **Show me the finished spec and ask me to confirm.** Only set
-   `Status: approved` after I explicitly approve. Then tell me the exact command
-   to run next: `/genesis:build-feature specs/<name>.md`
+   `Status: approved` after I explicitly approve (and, for UI features, after the
+   design gate is resolved). Then tell me to run:
+   `/genesis:build-feature specs/<name>.md` — it's the single build entry point and
+   detects for itself whether this is new code or a change to existing code,
+   protecting existing work automatically.
 
 Do not write any implementation code in this phase.

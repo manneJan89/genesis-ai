@@ -15,15 +15,64 @@ you give them).
 Delegate to subagents **by name explicitly** at each step — don't assume Claude
 will auto-route to them.
 
+## Phase 0 — Route silently (new vs build-upon-existing)
+`build-feature` is the single entry point: "I planned it, now build it" — whether
+or not the target already exists. Detect which case you're in and handle it; do
+NOT ask me to run a different command.
+
+Glob/grep for the files, screens, or modules this spec targets:
+- **Targets don't exist → new construction.** Create them fresh.
+- **Targets already exist → build UPON them.** You are adding to existing code, not
+  replacing it. Before changing an existing file, lay a **characterization net**
+  over its current behavior (delegate to the **characterization-tester** subagent)
+  so any accidental change to existing behavior turns a test red. Then apply the
+  **modification contract**: add/modify only what this spec names, and leave all
+  other code — and all existing UI/design — byte-for-byte intact. Never rewrite a
+  working page/function the spec didn't ask you to change. This is what stops a new
+  spec from killing earlier work.
+
+Handle both cases in this one command. The only thing you surface to me here is the
+reuse check below.
+
+## Phase 0b — Reuse check (copy-paste is a defect)
+Before building, search the codebase for what you're about to create:
+- **Exact match found** (behaviorally identical component or function already
+  exists) → do not duplicate it. Tell me it exists and recommend reusing it; if the
+  spec needs a variation, propose extracting the shared part so both use one copy.
+  Ask before extracting (it touches existing call sites).
+- **Only partially similar** → mention it, but **default to leaving it separate**
+  (KISS over DRY — don't force merely-similar code into one flag-driven
+  abstraction). Extract only if I confirm the shared concept is real.
+- **Reusable-forward**: if what you're building is generic enough to be reused
+  elsewhere, ask whether to make it a shared component (respecting the project's
+  Component libraries setting) rather than burying it inline.
+
+"Exact" means behaviorally identical (same job, different variable names still
+counts), not character-identical.
+
 ## Phase 1 — Plan (read-only)
-Enter plan mode. Restate your implementation approach: files you'll touch, the
-shape of the change, and how it maps to each acceptance criterion. Stop and let
-me approve the plan before writing code. For anything large, propose doing it in
-reviewable chunks rather than one big pass.
+Enter plan mode. State the **touch budget**: for new code, the exact files you'll
+create; for existing code, the exact files AND the functions/sections within them
+you'll modify — everything else stays untouched. Map the work to each acceptance
+criterion. Stop and let me approve the touch budget before writing code. For
+anything large, propose reviewable chunks rather than one big pass.
 
 ## Phase 2 — Build
 Implement the approved plan. Respect the "Technical notes / constraints" and the
-out-of-scope list in the spec. Keep the change focused on this feature.
+out-of-scope list in the spec. Keep the change focused on this feature. If building
+upon existing code, stay strictly within the approved touch budget — wire new
+behavior *into* existing structure (for UI, into the existing widgets/layout),
+never rebuild what's already there. If the design gate on the spec is unresolved
+for a UI feature, stop (see Phase 1.5 below).
+
+## Phase 1.5 — Design gate (UI features only)
+If this feature renders UI, the spec must have a resolved **design source** (a file
+in `design/`, or an explicit "assume" that was approved). If the spec's design gate
+is unresolved, stop and tell me to settle it in `/genesis:spec` first — do not
+invent a design at build time. When a stored design exists, implement it in the
+**project's styling system** (Tailwind/Bootstrap/theme — whatever the project
+uses); do not copy the design file's raw CSS. Minor pixel drift from existing
+project styles is acceptable.
 
 ## Phase 3 — Unit tests
 Unless the spec's Test plan says to skip unit tests, delegate to the

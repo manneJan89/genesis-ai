@@ -48,6 +48,7 @@ Start from what you're trying to do:
 | Understand / document existing code | `/genesis:audit-feature <thing>` | `specs/<name>.md` describing what the code does *today*, with gaps and bugs flagged |
 | Change or extend existing code | `/genesis:audit-feature <thing>` → `/genesis:improve-feature specs/<name>.md` | The change, behind a characterization net that proves nothing else broke |
 | Find out what's wrong (don't know yet) | `/genesis:review <thing>` | A ranked list of real defects, perf hypotheses, and standards violations — each routed to the right command |
+| Turn a handed design into editable HTML | `/genesis:design <screen>` | A human-editable `design/<screen>.html` you can tweak directly |
 | Audit security across the app | `/genesis:security-check [scope]` | Attacker's-eye, checklist-driven vulnerability report routed to `/genesis:fix` |
 | Fix a reported bug | `/genesis:fix <what's broken>` | A failing test that reproduces it, a minimal fix, and that test left behind as a regression guard |
 | Make working code faster | `/genesis:audit-feature <thing>` (Change type = `refactor`) → `/genesis:optimize-feature specs/<name>.md` | Measured before/after numbers, behavior provably unchanged |
@@ -67,6 +68,9 @@ Rules of thumb:
   one spec: settles cross-cutting decisions (schema, enums, side effects, failure
   semantics, permissions) and breaks it into ordered slices. Run with no arguments
   to see where you left off. Optional — single features don't need one.
+- `/genesis:design <screen>` — converts a handed image, HTML/CSS, or Claude Design
+  export into ONE human-editable `design/<screen>.html` (semantic markup, CSS
+  variables, commented sections) you can tweak without an LLM. Writes no app code.
 - `/genesis:spec <feature>` — interactive interview for a NEW feature; writes an
   approved spec. Writes no code.
 - `/genesis:build-feature specs/<name>.md` — plan (you approve) → build → unit tests

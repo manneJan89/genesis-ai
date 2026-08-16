@@ -19,13 +19,19 @@ unchanged code before proceeding. This is the step that makes the change safe �
 do not skip it.
 
 ## Phase 2 — Plan (read-only)
-Enter plan mode. Lay out the change: files you'll touch, how it maps to the
+Enter plan mode. Lay out the change: **exactly which files, and which functions/
+sections within them, you will touch** (the touch budget), how it maps to the
 target acceptance criteria, and — for a refactor — your assurance that the
-characterization tests stay green throughout. Stop for my approval. Prefer small
+characterization tests stay green throughout. Everything not on that list stays
+untouched. Stop for my approval of the touch budget before writing. Prefer small
 reviewable chunks over one big pass.
 
 ## Phase 3 — Make the change
-Implement the approved plan.
+Implement the approved plan. **Modify only what the touch budget names; leave all
+other code — and all existing UI/design — byte-for-byte intact** (per the
+modification contract in Standards). Do not restyle or re-lay-out an existing
+screen unless the spec explicitly says "redesign". If integrating data into an
+existing page, wire the data *into* the existing widgets — do not rebuild the page.
 - **Change type = refactor:** the characterization net must stay green the entire
   time; run it frequently. Green net = behavior preserved.
 - **Change type = extend / bugfix:** the behaviors tagged **Change** or **Wrong**

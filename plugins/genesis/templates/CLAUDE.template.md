@@ -73,6 +73,13 @@ standards under Conventions below.
   project's dependencies, (3) any shared library this project has *explicitly*
   opted into under "Component libraries" below. Never introduce a new dependency
   to satisfy DRY without asking.
+  **Before building anything, search for what already exists.** If an **exact**
+  match (behaviorally identical component or function — same job, different names
+  still counts) is already in the codebase, reuse it, or extract it into a shared
+  component so there's one copy; ask before extracting. If something is only
+  **partially similar**, note it but leave it separate by default (see KISS) —
+  merging merely-similar code into one flag-driven abstraction is worse than the
+  duplication. Copy-paste of an existing block is a defect, not a shortcut.
 - **KISS — but not at the cost of readability.** DRY loses to KISS when they
   conflict. Do NOT collapse similar-looking code into one function bristling with
   boolean flags, optional params, and branches — that's harder to maintain than the
@@ -111,6 +118,17 @@ standards under Conventions below.
   - **Fail closed.** On an auth or validation error, deny access — never fall
     through to permitted. Don't expose stack traces or internal detail in errors
     sent to clients.
+
+- **Modifying existing code: change only what was asked.** When editing a file
+  that already exists, add and modify exactly what the spec names — and leave
+  everything else **byte-for-byte intact**. Do NOT rewrite working functions,
+  restructure a screen, rename things, or "improve" code the spec didn't mention,
+  however tempting. Existing UI/design is a **Keep**: never restyle or re-lay-out
+  an existing screen unless the spec explicitly says "redesign". If you believe an
+  untouched part genuinely needs changing, stop and propose it separately — don't
+  fold it into this change. Rewriting existing work as you "see fit" is the single
+  most destructive thing you can do; a modification that changes more than its
+  spec named is a defect, not initiative.
 
 - **Log failures — through the abstraction, never raw, never secrets.**
   - Log where a failure is **handled** (the catch that decides what happens), once
@@ -210,4 +228,5 @@ short — a pointer, not documentation.
 - Core modules / packages:
 - Tests live in:
 - Config / infra:
+- Stored designs (human-editable HTML, from `/genesis:design`): `design/`
 - Don't bother reading (generated, vendored, build output):

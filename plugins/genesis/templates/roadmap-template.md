@@ -48,12 +48,13 @@ One row per operation. Detail lives in each slice's spec.
 ## Slices
 Each becomes one `/genesis:spec <slice-name>`.
 
-| # | Slice | Status | Spec | Notes |
-|---|---|---|---|---|
-| 1 | `<slice-name>` | planned | — | carries shared foundation |
-| 2 | `<slice-name>` | planned | — | |
-| 3 | `<slice-name>` | planned | — | |
+| # | Slice | Type | Status | Spec | Notes |
+|---|---|---|---|---|---|
+| 1 | `<slice-name>` | new | planned | — | carries shared foundation |
+| 2 | `<slice-name>` | new | planned | — | |
+| 3 | `<slice-name>` | modify | planned | — | changes existing code → improve-feature |
 
+Type: `new` (build-feature) | `modify` (improve-feature — protects existing code).
 Status: `planned` → `in progress` → `done` (or `blocked — <reason>`).
 The build orchestrators update this automatically when a slice's spec is built.
 

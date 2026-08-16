@@ -105,6 +105,10 @@ Propose an ordered set of slices and explain the ordering. Rules:
 - Slice one carries the shared foundation — say so explicitly.
 - Name each slice in **kebab-case**; that name becomes its spec filename and is
   how `/genesis:spec` finds it.
+- Note per slice whether it's `new` (fresh code) or `modify` (changes existing
+  pages/modules) — useful context, but both go through `/genesis:spec` →
+  `/genesis:build-feature`, which detects and protects existing code itself. You
+  don't run a different command for modify slices.
 - Flag cross-slice dependencies, especially anything slice one must include for a
   later slice to work.
 
