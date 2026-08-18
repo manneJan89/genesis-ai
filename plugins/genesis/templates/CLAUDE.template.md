@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.10.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.11.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -132,6 +132,19 @@ standards under Conventions below.
   **Exception — a committed/hardcoded secret is live exposure, not a note for
   later:** log it AND stop to tell me immediately, because it needs rotating and
   purging from history, which can't wait for a backlog review.
+
+- **Follow the project's existing structure.** Before creating a new file or
+  deciding where code goes, look at how the project already organizes this kind of
+  thing and **match it.** If API calls for a service live in one file, add the new
+  call there — don't spin up a parallel file. Put models where models already live,
+  follow the existing foldering, layering, and naming patterns. Detect the
+  convention from the actual codebase (find the existing file/folder and conform),
+  don't impose a structure that seems reasonable in isolation — that's how a
+  codebase grows two or three competing patterns for the same thing. Introduce a
+  new structural pattern ONLY if the project has none for this, if I explicitly ask,
+  or if `/genesis:review` flagged the current structure for change. If you think the
+  existing structure is genuinely wrong, don't quietly work around it — log a
+  finding (`FINDINGS.md`) or raise it, don't fork the pattern.
 
 - **Modifying existing code: change only what was asked.** When editing a file
   that already exists, add and modify exactly what the spec names — and leave

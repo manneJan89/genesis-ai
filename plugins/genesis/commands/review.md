@@ -49,7 +49,11 @@ Look for these, in priority order:
 5. **Test coverage gaps** — behavior with no test, especially error paths and
    edge cases. Name the specific missing case, not "needs more tests".
 6. **Maintainability risks** — functions doing too much, unclear naming, hidden
-   coupling, anything that will make the next change dangerous.
+   coupling, anything that will make the next change dangerous. Also **structural
+   drift**: new code that departed from the project's existing patterns (a parallel
+   API file when one already exists, models placed inconsistently, competing
+   foldering) — and, conversely, an existing structure that has genuinely outgrown
+   itself and is worth refactoring (flag it as a deliberate change, with the reason).
 
 ## Rules for findings — follow these strictly
 - **Cite evidence.** Every finding names the file and line/symbol. No vague claims.
