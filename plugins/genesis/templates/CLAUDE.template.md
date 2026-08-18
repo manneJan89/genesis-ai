@@ -1,13 +1,16 @@
 # Project rules
 
+<!-- genesis-standards-version: 0.10.0 — run /genesis:sync after a plugin update to refresh these rules -->
+
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
 
 > This file was set up by the **genesis** plugin (`/genesis:setup`). It's
 > stack-agnostic: everything specific to *this* project — language, commands,
 > conventions, layout — lives in the **"PER-PROJECT — FILL THIS IN"** block at the
-> bottom. The rules above it are the same in every project. Re-run `/genesis:setup`
-> if the stack changes.
+> bottom. The rules above it are the same in every project. After a plugin update,
+> run `/genesis:sync` to pull new rules into this file; re-run `/genesis:setup` if
+> the stack changes.
 
 ## How we build features (spec-driven)
 

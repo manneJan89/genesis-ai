@@ -87,6 +87,10 @@ Rules of thumb:
   (authn, authz/IDOR, injection, secrets, exposure, transport, abuse, deps),
   reports and routes to `/genesis:fix`. Read-only. A structured self-review, not a
   pentest — it says what it can't verify statically.
+- `/genesis:sync` — after a plugin update, pulls new/changed Standards and rules
+  into this project's `CLAUDE.md` (commands update with the plugin, but CLAUDE.md
+  doesn't — this closes that gap). Preserves your per-project block; shows a diff
+  and asks before applying.
 - `/genesis:findings [item]` — no args lists the open `FINDINGS.md` backlog
   (out-of-scope issues logged during other commands), ranked. Name an item to route
   it to its fix flow and mark it done. The backlog is append-only history.
@@ -151,6 +155,10 @@ so the same agents work on any stack. Under the plugin they're namespaced
 ```
 
 ## Updating
+After `/plugin marketplace update genesis`, run **`/genesis:sync`** in each
+existing project to pull new Standards/rules into its `CLAUDE.md` — the plugin
+update refreshes commands and agents but not a project's already-written CLAUDE.md.
+
 Bump `version` in `.claude-plugin/plugin.json`, push, and users run
 `/plugin marketplace update genesis`. That refreshes agents and commands — but not
 a CLAUDE.md already written into a project. Re-run `/genesis:setup` (or edit by

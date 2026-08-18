@@ -57,6 +57,7 @@ reference and worked examples.
 | Turn a handed design into editable HTML | `/genesis:design <screen>` |
 | Audit security across the app | `/genesis:security-check` |
 | Work out-of-scope issues found earlier | `/genesis:findings` |
+| Pull new rules into a project after updating | `/genesis:sync` |
 | Fix a reported bug | `/genesis:fix <what's broken>` |
 | Understand existing code | `/genesis:audit-feature <thing>` |
 | Change / extend existing code | `/genesis:audit-feature <thing>` → `/genesis:improve-feature specs/<name>.md` |
