@@ -109,6 +109,9 @@ Use the bundled templates (do not invent structure):
 
 Then:
 - Write `specs/_TEMPLATE.md` from the spec template (create `specs/` if missing).
+- Create `FINDINGS.md` at the repo root from
+  `${CLAUDE_PLUGIN_ROOT}/templates/FINDINGS.template.md` if it doesn't exist — the
+  backlog where out-of-scope issues get logged (worked via `/genesis:findings`).
 - **CLAUDE.md handling:**
   - If the project has **no** `CLAUDE.md`, write one from the template with the
     per-project block filled in from step 2.

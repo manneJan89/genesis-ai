@@ -82,4 +82,6 @@ Write the report to `specs/reviews/<kebab-case-name>.md`. For each finding give:
   - "trivial — fix directly" — a one-line correction not worth a full flow
 
 Then show me the ranked list and ask which findings I want to act on. **Do not
-start fixing anything.**
+start fixing anything.** Offer to append any I don't act on now to `FINDINGS.md`
+so they aren't lost — especially anything medium+ — and log any committed secret
+there immediately while flagging it to me.

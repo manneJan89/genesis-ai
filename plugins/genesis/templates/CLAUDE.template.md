@@ -119,6 +119,17 @@ standards under Conventions below.
     through to permitted. Don't expose stack traces or internal detail in errors
     sent to clients.
 
+- **Out-of-scope findings: capture, don't act.** When you notice something
+  important that is NOT part of the current task — a hardcoded secret, a bug, a
+  security hole, a performance trap, tech debt — do NOT fix it inline (that's scope
+  creep and breaks the touch budget) and do NOT let it vanish into a summary.
+  **Append it to `FINDINGS.md`** at the repo root (create it if missing) with
+  severity, location, what it is, and a suggested next step, then continue your
+  actual task. The backlog is worked separately via `/genesis:findings`.
+  **Exception — a committed/hardcoded secret is live exposure, not a note for
+  later:** log it AND stop to tell me immediately, because it needs rotating and
+  purging from history, which can't wait for a backlog review.
+
 - **Modifying existing code: change only what was asked.** When editing a file
   that already exists, add and modify exactly what the spec names — and leave
   everything else **byte-for-byte intact**. Do NOT rewrite working functions,
