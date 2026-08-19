@@ -46,10 +46,22 @@ Look for these, in priority order:
    duplicated logic (DRY), over-clever abstractions with flag parameters (KISS),
    magic strings where an enum belongs, non-exhaustive branching over a fixed
    value set, dependencies or component libraries the project didn't opt into.
-   Also UI-standard violations: raw HTML elements where a house component exists
-   (per `COMPONENTS.md`), emojis anywhere (UI, copy, comments), non-descriptive
-   names, and **`COMPONENTS.md` drift** (registered components that no longer match
-   the code, or shared components missing from the manifest).
+
+   **UI files — walk every element, don't skim.** This check is mechanical, not
+   impressionistic. Enumerate the actual elements in the file and verify each:
+   - Every raw `<button>`, `<input>`, `<select>`, `<textarea>`, checkbox, toggle,
+     table, card, chip, etc. → is there a house component in `COMPONENTS.md` for
+     it? If yes, using the raw element is a **confirmed finding** (cite the line).
+     Go element by element; do not sample.
+   - Every emoji character anywhere (UI, labels, titles, copy) → **confirmed
+     finding**; icons must be `surespace-icon`/SVG.
+   - Repeated markup structure (same block 2+ times) → should be a shared
+     component; flag it.
+   - Non-descriptive names (`isTF`, `flag`, cryptic abbreviations) → flag.
+   - `COMPONENTS.md` drift: a registered component that no longer matches the code,
+     or a shared component missing from the manifest.
+   Produce one verdict per relevant element — a rich file with interesting logic is
+   NOT a reason to glance past the UI pass.
 5. **Test coverage gaps** — behavior with no test, especially error paths and
    edge cases. Name the specific missing case, not "needs more tests".
 6. **Maintainability risks** — functions doing too much, unclear naming, hidden

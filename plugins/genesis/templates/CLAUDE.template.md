@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.12.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.13.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -30,6 +30,12 @@ Don't write implementation code for a feature until an approved spec exists in `
 - Tests are derived from the spec's acceptance criteria, not from whatever the
   implementation happens to do. If code and spec disagree, the spec wins and the
   discrepancy gets flagged.
+- **Test happy AND unhappy paths — always, even when the spec omits the unhappy
+  one.** For every operation: success and failure. For every async/loading flow:
+  state resets on both branches (the never-unset `loading` bug). For every
+  permission: the allowed and the denied actor (assert the gated thing is absent
+  for the denied one). For every input: valid and invalid/empty/boundary. Bugs
+  live in the paths nobody asserted, so these are not optional.
 - Use the **commands defined below** to run tests, lint, build, and benchmark —
   never assume a command; read it from this file.
 - A feature is "done" only when its acceptance criteria pass and its performance
