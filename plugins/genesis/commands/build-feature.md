@@ -112,6 +112,19 @@ Check the spec's performance budget. If one exists, verify it with a concrete
 measurement (a benchmark, a timed run, a load test — whatever fits). Report the
 numbers against the target. If no budget was specified, say so and move on.
 
+## Phase 6.5 — Component manifest + completion gate
+- **Manifest write-back:** if this feature created or changed a shared UI
+  component, update `COMPONENTS.md` (use-for, API, can/can't) so it stays the
+  authoritative registry. If it should have used a house component and didn't,
+  that's a defect — fix it, don't record around it.
+- **Completion gate — required assets present?** If the feature needs an
+  icon/image/asset that was NOT provided (see the icons-and-assets standard), you
+  may finish all the code, but you **must NOT report the feature `done`.** Mark it
+  **blocked-on-asset**, ensure a finding is logged in `FINDINGS.md`, and tell me:
+  "Code complete, but <asset> is still missing — provide it and I'll finish, or add
+  it yourself and I'll verify and mark it done." Any placeholder or emoji stand-in
+  is not acceptable. I can override and mark it done myself; that's my call.
+
 ## Phase 7 — Update the roadmap (if any)
 If the spec header names a roadmap (`Roadmap: specs/roadmaps/<name>.md (slice N …)`),
 open that roadmap and:

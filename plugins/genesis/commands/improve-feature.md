@@ -67,6 +67,12 @@ regression (fix the code) — don't loop blindly on it.
 Verify the spec's performance budget with a real measurement. For refactors aimed
 at performance, report before-vs-after numbers. If no budget, say so.
 
+## Phase 7.5 — Component manifest + completion gate
+- If a shared UI component was created or changed, update `COMPONENTS.md`.
+- If a required icon/image/asset wasn't provided, finish the code but do **not**
+  mark the feature `done` — set **blocked-on-asset**, log a finding, and tell me.
+  No emoji/placeholder stand-ins. I can override.
+
 ## Phase 8 — Update the roadmap (if any)
 If the spec header names a roadmap (`Roadmap: specs/roadmaps/<name>.md (slice N …)`),
 open that roadmap and:

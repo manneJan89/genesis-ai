@@ -112,6 +112,11 @@ Then:
 - Create `FINDINGS.md` at the repo root from
   `${CLAUDE_PLUGIN_ROOT}/templates/FINDINGS.template.md` if it doesn't exist — the
   backlog where out-of-scope issues get logged (worked via `/genesis:findings`).
+- Create `COMPONENTS.md` at the repo root from
+  `${CLAUDE_PLUGIN_ROOT}/templates/COMPONENTS.template.md` if it doesn't exist — the
+  shared-UI-component registry. For an existing project with UI, offer to scan for
+  components to seed it (as `/genesis:components scan` does); for a new project,
+  leave it empty (normal).
 - **CLAUDE.md handling:**
   - If the project has **no** `CLAUDE.md`, write one from the template with the
     per-project block filled in from step 2.

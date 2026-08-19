@@ -46,6 +46,10 @@ Look for these, in priority order:
    duplicated logic (DRY), over-clever abstractions with flag parameters (KISS),
    magic strings where an enum belongs, non-exhaustive branching over a fixed
    value set, dependencies or component libraries the project didn't opt into.
+   Also UI-standard violations: raw HTML elements where a house component exists
+   (per `COMPONENTS.md`), emojis anywhere (UI, copy, comments), non-descriptive
+   names, and **`COMPONENTS.md` drift** (registered components that no longer match
+   the code, or shared components missing from the manifest).
 5. **Test coverage gaps** — behavior with no test, especially error paths and
    edge cases. Name the specific missing case, not "needs more tests".
 6. **Maintainability risks** — functions doing too much, unclear naming, hidden

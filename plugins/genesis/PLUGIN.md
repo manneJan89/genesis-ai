@@ -49,6 +49,7 @@ Start from what you're trying to do:
 | Change or extend existing code | `/genesis:audit-feature <thing>` → `/genesis:improve-feature specs/<name>.md` | The change, behind a characterization net that proves nothing else broke |
 | Find out what's wrong (don't know yet) | `/genesis:review <thing>` | A ranked list of real defects, perf hypotheses, and standards violations — each routed to the right command |
 | Turn a handed design into editable HTML | `/genesis:design <screen>` | A human-editable `design/<screen>.html` you can tweak directly |
+| See/manage which shared components to use | `/genesis:components` | The house-component registry; scan to seed it |
 | See / work out-of-scope issues found during other work | `/genesis:findings` | The backlog, ranked; or route one to its fix flow |
 | Audit security across the app | `/genesis:security-check [scope]` | Attacker's-eye, checklist-driven vulnerability report routed to `/genesis:fix` |
 | Fix a reported bug | `/genesis:fix <what's broken>` | A failing test that reproduces it, a minimal fix, and that test left behind as a regression guard |
@@ -91,6 +92,9 @@ Rules of thumb:
   into this project's `CLAUDE.md` (commands update with the plugin, but CLAUDE.md
   doesn't — this closes that gap). Preserves your per-project block; shows a diff
   and asks before applying.
+- `/genesis:components [scan|name]` — view/manage `COMPONENTS.md`, the registry of
+  shared UI components agents must use instead of raw elements. No args lists it
+  (empty is normal on a new project); `scan` seeds it from the codebase.
 - `/genesis:findings [item]` — no args lists the open `FINDINGS.md` backlog
   (out-of-scope issues logged during other commands), ranked. Name an item to route
   it to its fix flow and mark it done. The backlog is append-only history.

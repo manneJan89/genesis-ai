@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.11.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.12.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -132,6 +132,43 @@ standards under Conventions below.
   **Exception — a committed/hardcoded secret is live exposure, not a note for
   later:** log it AND stop to tell me immediately, because it needs rotating and
   purging from history, which can't wait for a backlog review.
+
+- **Descriptive, self-documenting names (all code, front and back).** A name must
+  say what the thing is without decoding. Booleans read as questions
+  (`isTrueFalseQuestion`, `canManageQuiz` — not `flag`, not `isTF`). No cryptic
+  abbreviations, no single letters except loop indices. Clear beats both cryptic
+  AND bloated — don't pad names to be "descriptive"; say exactly what it is.
+
+- **No emojis. Anywhere.** Not in UI, not in user-facing copy ("Thanks for
+  registering 🎉" is banned), not in comments, logs, or commit messages. For
+  iconography use **SVG icons**, never an emoji standing in for an icon.
+
+- **Use the project's shared UI components — this is mandatory, not preferred.**
+  The project's component manifest (`COMPONENTS.md`) lists the house components and
+  what each does. If a house component exists for a UI primitive (button, input,
+  card, modal, etc.), a raw HTML/framework-native equivalent is **banned** — use
+  the house component. Read `COMPONENTS.md` before writing UI; don't scan the whole
+  codebase to rediscover components each time.
+  - **Repeated markup is a component.** The same structural block appearing 2+
+    times (in a file or across the project) should be extracted into a reusable
+    component — flag it and propose the extraction.
+  - **Gap handling: extend, never fork.** If a house component doesn't do something
+    you need (an icon variant, a danger tone), do NOT abandon it and hand-roll a
+    raw element or a second parallel component. Propose **adding the capability to
+    the existing shared component** and ask me before doing it (mid-session is
+    fine). One source of truth per primitive.
+  - When you create or change a shared component, **update `COMPONENTS.md`** so its
+    capabilities/limits stay accurate (see the manifest write-back rule).
+
+- **Icons and assets: ask, don't invent, don't emoji.** When an icon/image is
+  needed: if the project uses an icon library, ask which icon (I give a name); if
+  it uses standalone SVGs/assets, ask me to provide the file. **Never substitute an
+  emoji, invent an SVG, or ship a placeholder.** If the asset isn't provided,
+  implement everything around it, log a finding (`FINDINGS.md`), and treat the
+  feature as **blocked-on-asset** — it can't be marked `done` until the asset is in
+  (see the completion gate in the build orchestrators). Extract an asset from a
+  design only if I explicitly ask (and note a PNG design may not yield a usable
+  vector).
 
 - **Follow the project's existing structure.** Before creating a new file or
   deciding where code goes, look at how the project already organizes this kind of
