@@ -21,6 +21,15 @@ than skimming everything shallowly. Ask me only if the scope is genuinely unclea
 Read the code in scope and the tests that cover it. Note what the tests actually
 assert — untested paths are where defects hide.
 
+**Review a component as a unit.** A UI component's template and its backing class
+are one thing — a name like `isTrueFalse` or a `loading` flag is *defined* in the
+class and only *referenced* in the template. So when reviewing a component's
+template (`.html`), also read its paired class (`.ts`/controller) and its styles if
+relevant; when reviewing the class, read the template. Reviewing half a component
+misses the half in the other file (this is why an earlier pass missed cryptic
+names — they lived in the `.ts`). Keep this bounded to the component being reviewed
+— don't expand to the whole module.
+
 ## Phase 2 — Findings
 Look for these, in priority order:
 
@@ -57,7 +66,14 @@ Look for these, in priority order:
      finding**; icons must be `surespace-icon`/SVG.
    - Repeated markup structure (same block 2+ times) → should be a shared
      component; flag it.
-   - Non-descriptive names (`isTF`, `flag`, cryptic abbreviations) → flag.
+   - Non-descriptive names (`isTF`, `flag`, cryptic abbreviations) → flag. **If you
+     can't tell what a name means even after reading its definition in the backing
+     class, that IS a finding** — say "I can't tell what `<name>` does" and propose
+     a clearer name. Don't skip a name just because it's defined in another file.
+   - **Accessibility of interactive elements**: custom interactive elements (raw
+     `<div>`/`<span>` with click handlers, hand-rolled widgets) missing keyboard
+     operability, role, focus state, or labels → confirmed finding. Note that using
+     the house component would usually have provided these.
    - `COMPONENTS.md` drift: a registered component that no longer matches the code,
      or a shared component missing from the manifest.
    Produce one verdict per relevant element — a rich file with interesting logic is

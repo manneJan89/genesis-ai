@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.13.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.14.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -144,6 +144,10 @@ standards under Conventions below.
   (`isTrueFalseQuestion`, `canManageQuiz` — not `flag`, not `isTF`). No cryptic
   abbreviations, no single letters except loop indices. Clear beats both cryptic
   AND bloated — don't pad names to be "descriptive"; say exactly what it is.
+  **If you can't tell what a name means from context, that is itself the finding:**
+  say so plainly ("I can't tell what `isTrueFalse` refers to — true/false *what*?")
+  and propose a clearer name, rather than silently accepting it. Not understanding a
+  name is a signal to rename it, not to move on.
 
 - **No emojis. Anywhere.** Not in UI, not in user-facing copy ("Thanks for
   registering 🎉" is banned), not in comments, logs, or commit messages. For
@@ -175,6 +179,17 @@ standards under Conventions below.
   (see the completion gate in the build orchestrators). Extract an asset from a
   design only if I explicitly ask (and note a PNG design may not yield a usable
   vector).
+
+- **New interactive components are born accessible.** When you build a genuinely
+  new interactive component (not covered by a house component), it must be
+  accessible from the start, not retrofitted later: keyboard reachable and operable
+  (Tab to it, Enter/Space/arrows as appropriate), correct semantic role
+  (`role=`/native element), visible focus state, labels/`aria-*` where meaning isn't
+  conveyed by text, and sensible focus management (e.g. focus moves into a dialog
+  and back on close). This is why house components are mandatory — they already bake
+  this in; a hand-rolled equivalent that drops it is a defect. When such a component
+  is added to `COMPONENTS.md`, note its accessibility support like any other
+  capability.
 
 - **Follow the project's existing structure.** Before creating a new file or
   deciding where code goes, look at how the project already organizes this kind of
