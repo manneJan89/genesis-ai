@@ -49,6 +49,7 @@ Start from what you're trying to do:
 | Change or extend existing code | `/genesis:audit-feature <thing>` → `/genesis:improve-feature specs/<name>.md` | The change, behind a characterization net that proves nothing else broke |
 | Find out what's wrong (don't know yet) | `/genesis:review <thing>` | A ranked list of real defects, perf hypotheses, and standards violations — each routed to the right command |
 | Turn a handed design into editable HTML | `/genesis:design <screen>` | A human-editable `design/<screen>.html` you can tweak directly |
+| Replace a screen/component's look (keep behavior) | `/genesis:redesign <unit>` | New design approved, then UI replaced with behavior held constant |
 | See/manage which shared components to use | `/genesis:components` | The house-component registry; scan to seed it |
 | See / work out-of-scope issues found during other work | `/genesis:findings` | The backlog, ranked; or route one to its fix flow |
 | Audit security across the app | `/genesis:security-check [scope]` | Attacker's-eye, checklist-driven vulnerability report routed to `/genesis:fix` |
@@ -101,6 +102,10 @@ Rules of thumb:
 - `/genesis:fix <bug>` — capture the report → investigate (read-only) → **reproduce
   with a failing test** → minimal fix (bug-fixer) → verify the full suite → check
   whether the same bug exists elsewhere. Won't fix what it can't reproduce.
+- `/genesis:redesign <screen-or-component>` — replaces the visuals of ONE screen or
+  shared component while keeping behavior. Render-surface audit (not behavioral),
+  new design written to `design/` and approved before code, behavior netted, new
+  features found are logged not built. Multi-screen redesign → use a roadmap.
 - `/genesis:improve-feature specs/<name>.md` — characterization net first → plan (you
   approve) → change → tests → acceptance → fix loop → perf → summary.
 - `/genesis:optimize-feature specs/<name>.md` — baseline + profile → safety net →

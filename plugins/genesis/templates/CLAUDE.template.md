@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.14.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.15.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.

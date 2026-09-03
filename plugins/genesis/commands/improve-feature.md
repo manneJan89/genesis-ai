@@ -30,8 +30,17 @@ reviewable chunks over one big pass.
 Implement the approved plan. **Modify only what the touch budget names; leave all
 other code — and all existing UI/design — byte-for-byte intact** (per the
 modification contract in Standards). Do not restyle or re-lay-out an existing
-screen unless the spec explicitly says "redesign". If integrating data into an
-existing page, wire the data *into* the existing widgets — do not rebuild the page.
+screen. If integrating data into an existing page, wire the data *into* the
+existing widgets — do not rebuild the page.
+
+> **Design is a Keep here.** `improve-feature` changes behavior and preserves the
+> existing look. If this task is actually a *redesign* (replacing the layout/visuals
+> of an existing screen or component), STOP and tell me to use `/genesis:redesign`
+> — that command keeps behavior and changes design, the inverse of this one. Don't
+> restyle from within improve-feature. If the feature adds NEW UI to an existing
+> screen and its design gate wasn't resolved in the spec, stop and settle it (a
+> design in `design/`, or an approved "assume") before building that UI — don't
+> improvise a look.
 - **Change type = refactor:** the characterization net must stay green the entire
   time; run it frequently. Green net = behavior preserved.
 - **Change type = extend / bugfix:** the behaviors tagged **Change** or **Wrong**
