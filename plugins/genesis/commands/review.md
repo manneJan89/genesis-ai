@@ -86,6 +86,13 @@ Look for these, in priority order:
    API file when one already exists, models placed inconsistently, competing
    foldering) — and, conversely, an existing structure that has genuinely outgrown
    itself and is worth refactoring (flag it as a deliberate change, with the reason).
+   **Dead code:** run the project's own unused-code tooling if CLAUDE.md lists one
+   (`dart analyze`, ESLint `no-unused-vars`, TS `noUnusedLocals`, etc.) and report
+   what it finds — that tier is mechanical and trustworthy. Beyond that, note any
+   code that *appears* orphaned (no in-repo references) as **suspected-unused —
+   needs confirmation**, never "confirmed dead": it may be reached by DI, reflection,
+   a template/route string, an event name, tests, or an external consumer. Never
+   auto-delete; removal is a deliberate step behind the characterization net.
 
 ## Rules for findings — follow these strictly
 - **Cite evidence.** Every finding names the file and line/symbol. No vague claims.
