@@ -66,8 +66,10 @@ never rebuild what's already there. If the design gate on the spec is unresolved
 for a UI feature, stop (see Phase 1.5 below).
 
 ## Phase 1.5 — Design gate (UI features only)
-If this feature renders UI, the spec must have a resolved **design source** (a file
-in `design/`, or an explicit "assume" that was approved). If the spec's design gate
+If this feature renders UI, **consult the `ux` skill** and apply its reasoning
+(hierarchy, spacing, the required states, affordance, accessibility, avoiding the
+generic AI look). The spec must have a resolved **design source** (a file in
+`design/`, or an explicit "assume" that was approved). If the spec's design gate
 is unresolved, stop and tell me to settle it in `/genesis:spec` first — do not
 invent a design at build time. When a stored design exists, implement it in the
 **project's styling system** (Tailwind/Bootstrap/theme — whatever the project

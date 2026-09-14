@@ -148,6 +148,15 @@ writing (a spec is a few KB). If your bill runs high:
   more than small slices that pass first try. Lean on roadmap slicing.
 - `/clear` between unrelated features so you're not re-processing stale context.
 
+## Skills
+- **ux** — design/UX reasoning (visual hierarchy, spacing & rhythm, the required UI
+  states, affordance & feedback, form UX, accessibility, avoiding the generic
+  AI-generated look). The UI commands (`build-feature`, `redesign`, `design`,
+  `review`) consult it automatically when a task involves UI; it stays out of
+  backend/logic work. Principles, not a house style — it makes design decisions
+  deliberate without imposing one look. Invoke directly with "use the ux skill on
+  this screen" if you want it on a plain prompt.
+
 ## Agents (used by the commands — you don't call these directly)
 test-writer · characterization-tester · perf-profiler · e2e-tester · bug-fixer.
 They read the actual test/lint/benchmark commands from the project's `CLAUDE.md`,

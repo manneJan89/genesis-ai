@@ -11,7 +11,11 @@ Redesign the look of: $ARGUMENTS
 functionality, you **log it, you do not build it** (see Phase 6). This is the
 inverse of `/genesis:improve-feature`, which keeps the design and changes behavior.
 
-Read CLAUDE.md first — Standards, `COMPONENTS.md`, and the styling system.
+Read CLAUDE.md first — Standards, `COMPONENTS.md`, and the styling system. **Consult
+the `ux` skill** — its reasoning (hierarchy, spacing/rhythm, the required states,
+affordance, accessibility, the de-AI tells) is the bar the new design must meet. If
+the handed design violates a UX principle, say so and propose the fix rather than
+faithfully reproducing a weak design.
 
 ## Phase 0 — Scope gate (one unit per run)
 Resolve what's being redesigned to a single unit:

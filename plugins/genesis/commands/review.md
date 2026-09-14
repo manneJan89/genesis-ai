@@ -11,6 +11,8 @@ nothing. Every finding gets routed to the command that should handle it.
 
 Read CLAUDE.md first — its **Standards**, **Conventions**, and **Component
 libraries** sections are the criteria you review against, not your personal taste.
+For UI files, also **consult the `ux` skill** and check against its principles
+(hierarchy, spacing, missing states, affordance, accessibility, the AI-look tells).
 
 ## Phase 0 — Scope
 Confirm what's in scope (a file, a feature, a module, or the most recent changes).

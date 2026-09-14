@@ -9,7 +9,9 @@ Produce a human-editable design file for: $ARGUMENTS
 This creates the stored, tweakable source of truth for a screen's look, saved in
 `design/`. It does NOT write any app code — `/genesis:spec` and
 `/genesis:build-feature` consume this file later and re-implement it in the
-project's styling system.
+project's styling system. **Consult the `ux` skill** — when you generate or tidy a
+design, apply its principles (hierarchy, spacing, states, affordance, the de-AI
+tells) so the stored design is sound, not just a literal tracing of an image.
 
 ## 1. Get the input
 Identify what I've handed you:
