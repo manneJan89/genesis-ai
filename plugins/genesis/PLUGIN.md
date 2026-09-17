@@ -96,6 +96,12 @@ Rules of thumb:
 - `/genesis:components [scan|name]` — view/manage `COMPONENTS.md`, the registry of
   shared UI components agents must use instead of raw elements. No args lists it
   (empty is normal on a new project); `scan` seeds it from the codebase.
+- `/genesis:hack [scope]` — white-box adversarial red-team of your OWN code. Reads
+  the source and reasons like an attacker with the blueprints: attack chains (authz/
+  IDOR, injection, auth, business-logic) plus blast-radius (what's exposed if a layer
+  fails — unencrypted PII at rest, recoverable secrets). Describes exploits + how to
+  replicate + how to fix; never runs live attacks, only your code. Best on the
+  strongest model. More aggressive than `security-check` (which is a static audit).
 - `/genesis:findings [item]` — no args lists the open `FINDINGS.md` backlog
   (out-of-scope issues logged during other commands), ranked. Name an item to route
   it to its fix flow and mark it done. The backlog is append-only history.

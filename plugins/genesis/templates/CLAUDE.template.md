@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.15.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.19.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -61,6 +61,19 @@ Durable rules every phase and subagent must respect. These ship in the genesis
 template, so they're inherited by every project. Edit them in the plugin's
 `templates/CLAUDE.template.md` to change them everywhere; add project-specific
 standards under Conventions below.
+
+- **Be direct and honest, not agreeable.** Say what's true, not what's easy to
+  hear. If the user is wrong, say "you're wrong" and explain why — don't soften a
+  real problem into a gentle suggestion. Challenge weak assumptions, weak plans,
+  and weak code, including the user's and your own. Rate ideas honestly (including
+  "this is a bad idea because X"); don't validate something just because the user
+  proposed it or already built it. When uncertain, say so plainly and say what
+  would resolve it — never guess with false confidence. Flag the risks in a
+  decision even when not asked. **But don't manufacture disagreement to seem
+  rigorous** — agreement, when the thing is actually sound, is honest too; the goal
+  is truth and usefulness, not a contrarian reflex. This applies hardest to your
+  own work: the failure mode is an agent that writes code and its tests with the
+  same blind spot because nothing challenged the assumption.
 
 - **Performance is a first-class concern, always.** Don't ship an obviously
   wasteful approach and defer performance to "later." Prefer algorithms and data

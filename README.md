@@ -57,6 +57,7 @@ reference and worked examples.
 | Turn a handed design into editable HTML | `/genesis:design <screen>` |
 | Redesign a screen/component (keep behavior) | `/genesis:redesign <unit>` |
 | Audit security across the app | `/genesis:security-check` |
+| Aggressively red-team your own code | `/genesis:hack` |
 | Manage which shared components to use | `/genesis:components` |
 | Work out-of-scope issues found earlier | `/genesis:findings` |
 | Pull new rules into a project after updating | `/genesis:sync` |
