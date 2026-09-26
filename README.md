@@ -16,7 +16,7 @@ without anyone needing to re-add the marketplace.
 ## Install
 
 ```
-/plugin marketplace add YOUR_GITHUB_USERNAME/genesis
+/plugin marketplace add manneJan89/genesis-ai
 /plugin install genesis@genesis
 /reload-plugins
 ```
@@ -83,11 +83,19 @@ component library, or nothing at all — the workflow doesn't care.
 
 ## Your standards live here
 
-`plugins/genesis/templates/CLAUDE.template.md` holds the rules every project
-inherits — performance, cost-consciousness with metered services, DRY/KISS, and
-enums over magic strings. Edit them **once** here and every project picks them up
-the next time you run `/genesis:setup`. Project-specific rules go in that project's
-own `CLAUDE.md`.
+The rules every project inherits live in two places:
+
+- **`plugins/genesis/skills/standards-*/`** — the detailed Standards (code quality,
+  security, performance/cost/scale, UI, logging). They load only when the work
+  calls for them, so they don't cost context on every call. Edit a skill once and
+  every project gets it on the next `/plugin marketplace update genesis` — no
+  `/genesis:sync` needed.
+- **`plugins/genesis/templates/CLAUDE.template.md`** — the short always-on core
+  (honesty, no secrets, change only what was asked, log out-of-scope findings, no
+  emojis) plus the table telling Claude which standards skill to load when.
+  Changes here reach existing projects via `/genesis:sync`.
+
+Project-specific rules go in that project's own `CLAUDE.md` under Conventions.
 
 ## Team auto-registration (optional)
 
@@ -96,7 +104,7 @@ Add to a project's `.claude/settings.json` so collaborators are prompted to inst
 ```json
 {
   "extraKnownMarketplaces": {
-    "genesis": { "source": { "source": "github", "repo": "YOUR_GITHUB_USERNAME/genesis" } }
+    "genesis": { "source": { "source": "github", "repo": "manneJan89/genesis-ai" } }
   }
 }
 ```
@@ -123,6 +131,7 @@ genesis/
 │       ├── .claude-plugin/plugin.json
 │       ├── commands/             # → /genesis:<name>
 │       ├── agents/               # → genesis:<name> (called by the commands)
+│       ├── skills/               # ux, standards-*, finding-confidence (load on demand)
 │       ├── templates/            # CLAUDE.md + spec templates used by /genesis:setup
 │       └── PLUGIN.md
 └── README.md
@@ -134,11 +143,5 @@ Bump `version` in the relevant `plugin.json`, push, and run
 `/plugin marketplace update genesis`. That refreshes commands and agents — but not
 a `CLAUDE.md` already written into a project. Re-run `/genesis:setup` (or edit by
 hand) to pull template changes into an existing project.
-
-## Before you publish
-
-- Replace `YOUR_NAME` / `YOUR_GITHUB_USERNAME` in `.claude-plugin/marketplace.json`,
-  `plugins/genesis/.claude-plugin/plugin.json`, and this README.
-- Push to a git repo named `genesis` (public, or accessible to your team).
 
 MIT.

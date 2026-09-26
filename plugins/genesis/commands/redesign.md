@@ -1,7 +1,7 @@
 ---
 description: Redesign one screen or shared component's look — keep behavior, replace the visuals
 argument-hint: [screen or component] — attach/point to the new design
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, Skill
 ---
 
 Redesign the look of: $ARGUMENTS
@@ -11,7 +11,7 @@ Redesign the look of: $ARGUMENTS
 functionality, you **log it, you do not build it** (see Phase 6). This is the
 inverse of `/genesis:improve-feature`, which keeps the design and changes behavior.
 
-Read CLAUDE.md first — Standards, `COMPONENTS.md`, and the styling system. **Consult
+Read CLAUDE.md first and load `genesis:standards-ui` — Standards, `COMPONENTS.md`, and the styling system. **Consult
 the `ux` skill** — its reasoning (hierarchy, spacing/rhythm, the required states,
 affordance, accessibility, the de-AI tells) is the bar the new design must meet. If
 the handed design violates a UX principle, say so and propose the fix rather than

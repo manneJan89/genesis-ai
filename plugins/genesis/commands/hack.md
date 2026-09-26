@@ -1,7 +1,7 @@
 ---
 description: White-box red-team of your OWN code — adversarial attack-chain + blast-radius analysis, logged with replication and fix
 argument-hint: [scope: whole app (default), a feature, or an area]
-allowed-tools: Read, Grep, Glob, Bash, Agent
+allowed-tools: Read, Grep, Glob, Bash, Agent, Skill
 ---
 
 Red-team the codebase: ${ARGUMENTS:-the whole application}
@@ -10,6 +10,10 @@ You have the source (white-box) — so reason like an attacker **who already has
 blueprints**. Don't fumble for a back door; read the code and find the real holes:
 the one route missing an auth check, the business-logic flaw, the race condition,
 the data that's exposed if a layer fails. That's the advantage — use it.
+
+Load `genesis:standards-security` first. It is the floor, not the ceiling: every
+violation of it is a finding, but your job is to go past the checklist to the
+chains and logic flaws a checklist misses.
 
 ## Rules (read first — these are hard)
 - **Analyze and DESCRIBE exploits; never fire live ones.** Aggression is in the
@@ -52,14 +56,21 @@ takes a class and reports independently so no single tunnel-vision):
    unencrypted, logged, over-returned, or recoverable that shouldn't be.
 
 ## Report — the format is the point
+First merge the passes' results and load the `genesis:finding-confidence` skill:
+dedupe, run the disprove pass on each chain (is there a guard somewhere along it
+that breaks the chain?), and score. Only 70+ goes in the exploit list; critical
+chains at 40–69 go in marked *unverified*; the rest follow the skill's thresholds.
+
 Write to `specs/security/hack-<date>.md`, findings ranked critical→low. **Every
-finding MUST have all four:**
+finding MUST have all five:**
 - **What** — the vulnerability, and the attack chain if it's a chain.
 - **Replicate** — exact steps to reproduce it (to run in a safe env), with the
   file:line evidence that proves it exists in the code.
 - **Fix** — the concrete remedy.
 - **Severity** — critical / high / medium / low, and the impact (what the attacker
   gains).
+- **Confidence** — the 0–100 score, and for anything under 90, which link in the
+  chain you couldn't confirm statically.
 
 Add an **"Also worth hardening"** section for defense-in-depth suggestions that
 aren't a live exploit but are real risk — e.g. "ID numbers stored unencrypted; if

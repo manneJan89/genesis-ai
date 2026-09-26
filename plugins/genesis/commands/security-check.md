@@ -1,14 +1,15 @@
 ---
 description: Deliberate whole-surface security audit — attacker's-eye, checklist-driven, read-only
 argument-hint: [scope: whole app (default), a feature, or an area]
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, Skill
 ---
 
 Run a security audit of: ${ARGUMENTS:-the whole application}
 
 You are **read-only**. You find and report vulnerabilities and route them; you fix
-nothing. Read CLAUDE.md first — its **Security** and **Scale** standards are the
-bar you audit against.
+nothing. Load the `genesis:standards-security` and `genesis:standards-performance` skills
+first — their **Security** and **Scale** rules are the bar you audit against —
+and read CLAUDE.md for project-specific Conventions.
 
 ## What this is — and isn't
 This is a **structured self-review against common vulnerability classes**, run with
@@ -73,13 +74,19 @@ For every entry point, work the checklist. Cite file + line for each finding.
   `pip-audit`, `flutter pub outdated`), run it and summarize — don't auto-upgrade.
 
 ## 3. Report and route
+Before writing, load the `genesis:finding-confidence` skill: run every candidate
+through its disprove pass (look for the guard, middleware, rule, or framework
+default that already covers it) and score it. Its thresholds decide what goes in
+the main list, the "Unverified — worth a look" section, or gets dropped.
+
 Write to `specs/security/<scope-or-date>.md`. Start with a one-line scope + the
 "not a pentest" caveat. Then, ranked by severity:
 
 - **Severity**: critical / high / medium / low
 - **Class**: authn / authz-IDOR / injection / secrets / exposure / transport /
   abuse / dependency
-- **Confidence**: confirmed in code / needs runtime verification
+- **Confidence**: 0–100 score (finding-confidence skill); for 70–89, what needs
+  runtime verification
 - **Location**: file + line, and which entry point
 - **Impact**: what an attacker gains
 - **Fix direction**: the correct remedy (not code yet)

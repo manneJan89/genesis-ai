@@ -1,7 +1,7 @@
 ---
 description: Build a feature from an approved spec, then test, fix, and verify it
 argument-hint: [path/to/spec.md]
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, Skill
 ---
 
 Orchestrate the full build pipeline for the spec at: $ARGUMENTS
@@ -53,19 +53,13 @@ counts), not character-identical.
 ## Phase 1 — Plan (read-only)
 Enter plan mode. State the **touch budget**: for new code, the exact files you'll
 create; for existing code, the exact files AND the functions/sections within them
-you'll modify — everything else stays untouched. Map the work to each acceptance
-criterion. Stop and let me approve the touch budget before writing code. For
-anything large, propose reviewable chunks rather than one big pass.
+you'll modify — everything else stays untouched. Name the **public surface** you'll
+add (functions, classes, components, endpoints — with signatures), since the tests
+in Phase 3 are written against it before any logic exists. Map the work to each
+acceptance criterion. Stop and let me approve the touch budget before writing code.
+For anything large, propose reviewable chunks rather than one big pass.
 
-## Phase 2 — Build
-Implement the approved plan. Respect the "Technical notes / constraints" and the
-out-of-scope list in the spec. Keep the change focused on this feature. If building
-upon existing code, stay strictly within the approved touch budget — wire new
-behavior *into* existing structure (for UI, into the existing widgets/layout),
-never rebuild what's already there. If the design gate on the spec is unresolved
-for a UI feature, stop (see Phase 1.5 below).
-
-## Phase 1.5 — Design gate (UI features only)
+## Phase 2 — Design gate (UI features only)
 If this feature renders UI, **consult the `ux` skill** and apply its reasoning
 (hierarchy, spacing, the required states, affordance, accessibility, avoiding the
 generic AI look). The spec must have a resolved **design source** (a file in
@@ -76,24 +70,56 @@ invent a design at build time. When a stored design exists, implement it in the
 uses); do not copy the design file's raw CSS. Minor pixel drift from existing
 project styles is acceptable.
 
-## Phase 3 — Unit tests
-Unless the spec's Test plan says to skip unit tests, delegate to the
-**test-writer** subagent:
+Skip this phase for backend/data/logic-only features.
 
-    Use the test-writer subagent to write unit tests for this feature from
-    <spec path>. Derive tests from the acceptance criteria, not from my
-    implementation.
+## Phase 3 — Tests first (red)
+Unless the spec's Test plan says to skip unit tests, the tests are written
+**before the implementation**, from the spec alone:
 
-Using a separate agent here is deliberate: it stops tests from simply rubber-
-stamping the implementation's bugs.
+1. **Scaffold the surface.** Create the files and the public signatures named in
+   the approved plan with no behavior — bodies that throw "not implemented" (or
+   the stack's equivalent). This is only so the tests compile; write no logic.
+   For build-upon-existing, lay the characterization net first (Phase 0).
+2. **Delegate to the test-writer subagent in `tests-first` mode:**
 
-## Phase 4 — Acceptance / e2e check
+       Use the test-writer subagent in tests-first mode to write unit tests for
+       <spec path>. The approved surface is: <signatures from the plan>. Derive
+       every test from the acceptance criteria; no implementation exists yet.
+
+3. **Confirm red.** Every new test must fail, and fail for the right reason — an
+   assertion or "not implemented", not a syntax error, bad import, or broken
+   fixture. A new test that passes against the empty scaffold is testing nothing;
+   send it back to the test-writer. Characterization tests (build-upon-existing)
+   must still be green.
+
+Writing tests first is the point of a separate test-writer: tests written after
+the code tend to encode what the code does, bugs included. Tests written from the
+spec against an empty surface can only encode what the spec promised.
+
+## Phase 4 — Build (green)
+Load the Genesis standards skills that apply to this feature (see CLAUDE.md →
+Standards) before writing code. Implement the approved plan until the Phase 3
+tests pass. Respect the "Technical
+notes / constraints" and the out-of-scope list in the spec. Keep the change focused
+on this feature. If building upon existing code, stay strictly within the approved
+touch budget — wire new behavior *into* existing structure (for UI, into the
+existing widgets/layout), never rebuild what's already there.
+
+**Don't edit a test to make it pass.** If a test looks wrong (it contradicts the
+spec, or asserts something the spec never said), stop and show me the test, the
+criterion, and why you think it's wrong. The test or the spec changes only with my
+say-so.
+
+When the tests are green, run the project's lint/type-check command and fix what
+it reports before moving on.
+
+## Phase 5 — Acceptance / e2e check
 Delegate to the **e2e-tester** subagent to run the suite and exercise the feature
 against the spec's acceptance criteria. It reports bugs; it does not fix them.
 Collect its structured bug list.
 
-## Phase 5 — Fix loop
-If Phase 4 found bugs, delegate each (or the batch) to the **bug-fixer** subagent
+## Phase 6 — Fix loop
+If Phase 5 found bugs, delegate each (or the batch) to the **bug-fixer** subagent
 with the reproduction steps. After fixes land, run the **e2e-tester** again on the
 whole feature. Repeat until the suite is green against every acceptance criterion,
 or until you hit a blocker you can't resolve — in which case stop and report it
@@ -109,12 +135,12 @@ re-emits the whole change. Getting my input is cheaper than a fourth blind pass.
 > `/goal all tests pass and the acceptance criteria in <spec> are met`
 > and let Claude iterate build → test → fix → re-test on its own.
 
-## Phase 6 — Performance
+## Phase 7 — Performance
 Check the spec's performance budget. If one exists, verify it with a concrete
 measurement (a benchmark, a timed run, a load test — whatever fits). Report the
 numbers against the target. If no budget was specified, say so and move on.
 
-## Phase 6.5 — Component manifest + completion gate
+## Phase 7.5 — Component manifest + completion gate
 - **Manifest write-back:** if this feature created or changed a shared UI
   component, update `COMPONENTS.md` (use-for, API, can/can't) so it stays the
   authoritative registry. If it should have used a house component and didn't,
@@ -127,7 +153,7 @@ numbers against the target. If no budget was specified, say so and move on.
   it yourself and I'll verify and mark it done." Any placeholder or emoji stand-in
   is not acceptable. I can override and mark it done myself; that's my call.
 
-## Phase 7 — Update the roadmap (if any)
+## Phase 8 — Update the roadmap (if any)
 If the spec header names a roadmap (`Roadmap: specs/roadmaps/<name>.md (slice N …)`),
 open that roadmap and:
 - mark this slice `done`,
@@ -141,6 +167,7 @@ slices depend on it. Do NOT rewrite older specs; they are point-in-time history.
 
 If the spec names no roadmap, skip this phase.
 
-## Phase 8 — Summary
-Report: what was built, which acceptance criteria now pass, test results,
+## Phase 9 — Summary
+Report: what was built, which acceptance criteria now pass, test results
+(including how many tests went red → green),
 performance numbers, and anything left open or descoped.

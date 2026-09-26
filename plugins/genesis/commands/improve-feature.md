@@ -1,7 +1,7 @@
 ---
 description: Improve an existing feature from an approved audit spec, safely
 argument-hint: [path/to/spec.md]
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, Skill
 ---
 
 Orchestrate a safe improvement of an existing feature from the spec at: $ARGUMENTS
@@ -26,8 +26,18 @@ characterization tests stay green throughout. Everything not on that list stays
 untouched. Stop for my approval of the touch budget before writing. Prefer small
 reviewable chunks over one big pass.
 
-## Phase 3 — Make the change
-Implement the approved plan. **Modify only what the touch budget names; leave all
+## Phase 3 — Target tests first (red)
+Skip for a pure **refactor** (no new behavior — the characterization net is the
+test). Otherwise, scaffold any new public surface named in the plan (signatures
+only, no logic) and delegate to the **test-writer** subagent in `tests-first` mode
+to write unit tests for the *new/changed* acceptance criteria, derived from the
+spec, before the change is made. Confirm they fail for the right reason (assertion
+or "not implemented", not a broken import). These sit alongside the
+characterization net, which must still be green.
+
+## Phase 4 — Make the change (green)
+Load the Genesis standards skills that apply (see CLAUDE.md → Standards), then
+implement the approved plan. **Modify only what the touch budget names; leave all
 other code — and all existing UI/design — byte-for-byte intact** (per the
 modification contract in Standards). Do not restyle or re-lay-out an existing
 screen. If integrating data into an existing page, wire the data *into* the
@@ -47,10 +57,8 @@ existing widgets — do not rebuild the page.
   will make their characterization tests fail — that's expected. Update those
   specific tests to the new target behavior; the Keep tests must still pass.
 
-## Phase 4 — Target tests
-Delegate to the **test-writer** subagent to add unit tests for the *new/changed*
-acceptance criteria (derived from the spec, not the implementation). These sit
-alongside the characterization net.
+Make the Phase 3 tests pass without editing them. If one looks wrong, stop and
+show me rather than bending it. Run the lint/type-check command before moving on.
 
 ## Phase 5 — Acceptance / e2e check
 Delegate to the **e2e-tester** subagent to run the full suite (characterization +

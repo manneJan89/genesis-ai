@@ -1,7 +1,7 @@
 ---
 description: Review existing code for bugs, performance risks, and standards violations
 argument-hint: [file, feature, module, or "recent changes"]
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, Skill
 ---
 
 Review this and report what's wrong with it: $ARGUMENTS
@@ -10,7 +10,10 @@ You are **read-only** in this command. You find and report problems; you fix
 nothing. Every finding gets routed to the command that should handle it.
 
 Read CLAUDE.md first — its **Standards**, **Conventions**, and **Component
-libraries** sections are the criteria you review against, not your personal taste.
+libraries** sections — and load the Genesis standards skills that match the code in
+scope (`genesis:standards-code` always; `-security`, `-performance`, `-ui`,
+`-logging` as the code touches them). Those are the criteria you review against,
+not your personal taste.
 For UI files, also **consult the `ux` skill** and check against its principles
 (hierarchy, spacing, missing states, affordance, accessibility, the AI-look tells).
 
@@ -65,7 +68,7 @@ Look for these, in priority order:
      it? If yes, using the raw element is a **confirmed finding** (cite the line).
      Go element by element; do not sample.
    - Every emoji character anywhere (UI, labels, titles, copy) → **confirmed
-     finding**; icons must be `surespace-icon`/SVG.
+     finding**; icons must be the project's icon component or SVG.
    - Repeated markup structure (same block 2+ times) → should be a shared
      component; flag it.
    - Non-descriptive names (`isTF`, `flag`, cryptic abbreviations) → flag. **If you
@@ -97,6 +100,10 @@ Look for these, in priority order:
    auto-delete; removal is a deliberate step behind the characterization net.
 
 ## Rules for findings — follow these strictly
+- **Filter before you report.** Load the `genesis:finding-confidence` skill and run
+  every candidate through its disprove pass and 0–100 score. Only 70+ reaches the
+  main list; 40–69 goes under "Unverified — worth a look"; below 40 is dropped
+  (report the count).
 - **Cite evidence.** Every finding names the file and line/symbol. No vague claims.
 - **Performance findings are HYPOTHESES, not verdicts.** You have not measured
   anything. Say "likely hot path — worth measuring" and never "this is slow."
@@ -115,7 +122,8 @@ Look for these, in priority order:
 Write the report to `specs/reviews/<kebab-case-name>.md`. For each finding give:
 
 - **Severity**: blocker / major / minor / optional
-- **Confidence**: confirmed (evidence in code) / suspected (needs verification)
+- **Confidence**: 0–100 score from the finding-confidence skill (70–89: name the
+  one thing that would confirm it)
 - **Location**: file + line/symbol
 - **Why it matters**: the concrete consequence, not an abstraction
 - **Next step**: exactly one of —
