@@ -1,7 +1,7 @@
 ---
 description: Optimize existing working code, measure-driven, without changing behavior
 argument-hint: [path/to/spec.md]
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, Skill
 ---
 
 Orchestrate a performance optimization of existing code from the spec at:
@@ -34,6 +34,11 @@ should cut it by roughly N." Stop for my approval before changing code.
   didn't know about.
 
 ## Phase 4 — One change
+Load `genesis:standards-performance` and `genesis:standards-code` first (plus any
+other standard the change touches, per CLAUDE.md → Standards). A faster version
+still has to meet them: no new cache that leaks, no pagination dropped, no
+duplicated logic.
+
 Make exactly one change implementing the hypothesis. Don't bundle unrelated
 optimizations — one change per cycle so we know what moved the number.
 

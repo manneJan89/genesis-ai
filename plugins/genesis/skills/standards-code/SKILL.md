@@ -17,8 +17,8 @@ optional. Project-specific additions live in the project's CLAUDE.md under
   appears a third time, extract it.
   **Search order:** (1) this project's own code, (2) libraries already in this
   project's dependencies, (3) any shared library this project has *explicitly*
-  opted into under "Component libraries" below. Never introduce a new dependency
-  to satisfy DRY without asking.
+  opted into under "Component libraries" in the project's CLAUDE.md. Never
+  introduce a new dependency to satisfy DRY without asking.
   **Before building anything, search for what already exists.** If an **exact**
   match (behaviorally identical component or function — same job, different names
   still counts) is already in the codebase, reuse it, or extract it into a shared

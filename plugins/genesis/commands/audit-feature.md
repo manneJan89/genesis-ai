@@ -1,7 +1,7 @@
 ---
 description: Reverse-engineer a spec from existing code, then agree what to improve
 argument-hint: [path, module, or description of the existing feature]
-allowed-tools: Read, Grep, Glob, Write
+allowed-tools: Read, Grep, Glob, Write, Skill
 ---
 
 You are auditing an **existing** feature so we can safely improve it: $ARGUMENTS
@@ -23,7 +23,9 @@ Follow @specs/_TEMPLATE.md.
    the code actually does today, faithfully, including quirks and likely bugs.
    Don't describe what you assume it's *supposed* to do.
 
-3. **Assess it.** Call out: missing or thin test coverage, correctness bugs,
+3. **Assess it.** Load the Genesis standards skills that apply to this code (see
+   CLAUDE.md → Standards) and assess against them, not personal taste. Call out:
+   missing or thin test coverage, correctness bugs,
    edge cases it mishandles, performance concerns, and risky areas that will make
    change hard. Be concrete about where.
 

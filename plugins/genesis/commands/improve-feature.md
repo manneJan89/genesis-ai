@@ -32,8 +32,9 @@ test). Otherwise, scaffold any new public surface named in the plan (signatures
 only, no logic) and delegate to the **test-writer** subagent in `tests-first` mode
 to write unit tests for the *new/changed* acceptance criteria, derived from the
 spec, before the change is made. Confirm they fail for the right reason (assertion
-or "not implemented", not a broken import). These sit alongside the
-characterization net, which must still be green.
+or "not implemented", not a broken import). An absence test (denied user doesn't
+see X) may pass already; keep it as long as its positive counterpart fails. These
+sit alongside the characterization net, which must still be green.
 
 ## Phase 4 — Make the change (green)
 Load the Genesis standards skills that apply (see CLAUDE.md → Standards), then

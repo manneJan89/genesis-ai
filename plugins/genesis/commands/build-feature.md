@@ -89,8 +89,10 @@ Unless the spec's Test plan says to skip unit tests, the tests are written
 3. **Confirm red.** Every new test must fail, and fail for the right reason — an
    assertion or "not implemented", not a syntax error, bad import, or broken
    fixture. A new test that passes against the empty scaffold is testing nothing;
-   send it back to the test-writer. Characterization tests (build-upon-existing)
-   must still be green.
+   send it back to the test-writer. **Exception:** an absence test (denied user
+   doesn't see X, empty list renders nothing) passes on the scaffold by nature.
+   Keep it, as long as its positive counterpart exists and fails. Characterization
+   tests (build-upon-existing) must still be green.
 
 Writing tests first is the point of a separate test-writer: tests written after
 the code tend to encode what the code does, bugs included. Tests written from the
