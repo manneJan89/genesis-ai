@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.20.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.21.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -17,9 +17,17 @@ the one place to encode rules the whole pipeline obeys.
 The spec file is the source of truth that carries scope across phases — agents do
 not share a conversation.
 
-- New feature:      `/genesis:spec <feature>`  →  `/genesis:build-feature specs/<name>.md`
-- Existing feature: `/genesis:audit-feature <thing>`  →  `/genesis:improve-feature specs/<name>.md`
-- Make it faster:   `/genesis:audit-feature <thing>` (type=refactor)  →  `/genesis:optimize-feature specs/<name>.md`
+- Build a feature (new, or added onto existing code): `/genesis:spec <feature>` →
+  `/genesis:build-feature specs/<name>.md`. `build-feature` detects existing code
+  and protects it itself; there's no separate command for "existing".
+- Too big for one spec: `/genesis:roadmap <system>`, then one spec per slice.
+- Change existing behavior from an audit: `/genesis:audit-feature <thing>` →
+  `/genesis:improve-feature specs/<name>.md`
+- Replace a screen's look, keeping behavior: `/genesis:redesign <screen>`
+- Make it faster: `/genesis:audit-feature <thing>` (type=refactor) →
+  `/genesis:optimize-feature specs/<name>.md`
+- Fix a reported bug: `/genesis:fix <bug>`
+- Find problems: `/genesis:review`, `/genesis:security-check`, `/genesis:hack`
 
 Don't write implementation code for a feature until an approved spec exists in `specs/`.
 
@@ -73,6 +81,20 @@ ones that apply:**
 When delegating to a subagent, name the skills it should load in the prompt.
 To change a standard everywhere, edit its skill in the plugin; add project-specific
 standards under Conventions below.
+
+### Tripwires (binding even if the skill didn't load)
+The one rule from each skill that must never slip. If you're about to break one,
+stop and load the skill.
+- **Code:** reuse before you write; never copy-paste a block. Fixed value sets are
+  enums, not strings. Match the project's existing structure. (`standards-code`)
+- **Security:** the server enforces auth AND per-resource authorization on every
+  private endpoint; never trust client input. (`standards-security`)
+- **Performance:** no unbounded list queries; paginate, and filter at the query.
+  (`standards-performance`)
+- **UI:** if `COMPONENTS.md` lists a house component, a raw element is banned.
+  Never invent an icon. (`standards-ui`)
+- **Errors:** never swallow an error; log once where it's handled, through the
+  logger abstraction. (`standards-logging`)
 
 ### Always-on core
 

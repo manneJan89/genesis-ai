@@ -1,7 +1,7 @@
 ---
 description: Turn a handed design (image, HTML/CSS, or Claude Design export) into a human-editable HTML file in design/
 argument-hint: [screen/page name] — attach or point to the design
-allowed-tools: Read, Write, Edit, Grep, Glob
+allowed-tools: Read, Write, Edit, Grep, Glob, Skill
 ---
 
 Produce a human-editable design file for: $ARGUMENTS

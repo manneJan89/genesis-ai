@@ -53,6 +53,12 @@ orchestrator may also name them).
      A failure from a syntax error, bad import, or broken fixture is YOUR bug — fix
      it. A test that already passes against the empty scaffold tests nothing —
      tighten it or drop it and say why.
+     **Exception, absence tests:** a test that something is absent ("the denied
+     user doesn't see the button", "renders nothing when the list is empty")
+     passes trivially against an empty scaffold. Never drop one for that. Pair it
+     with its positive counterpart ("the allowed user does see the button") so the
+     pair fails on the scaffold, and report the absence test as "passes until its
+     pair is implemented".
    - **after-build:** report which pass and which fail.
 
 Do **not** modify implementation code or the scaffold — only test files. Fixing bugs is the
