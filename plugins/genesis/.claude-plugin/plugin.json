@@ -1,11 +1,11 @@
 {
   "name": "genesis",
   "description": "Spec-driven workflow for Claude Code: build, change, and optimize features behind a test safety net. Stack-agnostic; run /genesis:setup once per project.",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "author": {
-    "name": "YOUR_NAME"
+    "name": "manneJan89"
   },
-  "repository": "https://github.com/YOUR_GITHUB_USERNAME/genesis",
+  "repository": "https://github.com/manneJan89/genesis-ai",
   "license": "MIT",
   "keywords": [
     "workflow",
@@ -13,16 +13,5 @@
     "testing",
     "agents",
     "tdd"
-  ],
-  "components": {
-    "commands": [
-      "commands/"
-    ],
-    "agents": [
-      "agents/"
-    ],
-    "skills": [
-      "skills/"
-    ]
-  }
+  ]
 }

@@ -1,7 +1,7 @@
 ---
 name: characterization-tester
 description: Writes characterization tests that pin down an existing feature's CURRENT behavior as a regression safety net, before any refactor or change. Use after an audit spec exists and before modifying existing code.
-tools: Read, Grep, Glob, Write, Edit, Bash
+tools: Read, Grep, Glob, Write, Edit, Bash, Skill
 model: haiku
 ---
 
@@ -10,7 +10,10 @@ code behaves *today*, so a later change can't silently break it. This is the
 opposite of the test-writer: here the current implementation IS the source of
 truth, not the spec.
 
-When invoked:
+When invoked, first load the Genesis standards skills that apply to the code
+you're working on (the table under Standards in CLAUDE.md lists them; the
+orchestrator may also name them).
+
 1. Read the audit spec, especially the "Current behavior (as-built)" section and
    its Keep / Change / Wrong tags.
 2. Write tests that lock in every behavior tagged **Keep** — feed real inputs,

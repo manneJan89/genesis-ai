@@ -9,7 +9,7 @@ project with `/genesis:setup`.
 This repo is both the plugin and its marketplace (self-referencing), so:
 
 ```
-/plugin marketplace add YOUR_GITHUB_USERNAME/genesis
+/plugin marketplace add manneJan89/genesis-ai
 /plugin install genesis@genesis
 /reload-plugins
 ```
@@ -31,7 +31,7 @@ To have collaborators prompted to install automatically, add to the project's
 ```json
 {
   "extraKnownMarketplaces": {
-    "genesis": { "source": { "source": "github", "repo": "YOUR_GITHUB_USERNAME/genesis" } }
+    "genesis": { "source": { "source": "github", "repo": "manneJan89/genesis-ai" } }
   }
 }
 ```
@@ -76,8 +76,9 @@ Rules of thumb:
   variables, commented sections) you can tweak without an LLM. Writes no app code.
 - `/genesis:spec <feature>` — interactive interview for a NEW feature; writes an
   approved spec. Writes no code.
-- `/genesis:build-feature specs/<name>.md` — plan (you approve) → build → unit tests
-  (test-writer) → acceptance check (e2e-tester) → fix loop (bug-fixer) → perf check
+- `/genesis:build-feature specs/<name>.md` — plan (you approve) → design gate →
+  **tests first** (test-writer writes them from the spec; they must fail) → build
+  until green → acceptance check (e2e-tester) → fix loop (bug-fixer) → perf check
   → summary.
 - `/genesis:audit-feature <thing>` — reads EXISTING code, reverse-engineers what it
   does today, flags gaps/bugs, interviews you on the target, tags each behavior
@@ -113,7 +114,7 @@ Rules of thumb:
   new design written to `design/` and approved before code, behavior netted, new
   features found are logged not built. Multi-screen redesign → use a roadmap.
 - `/genesis:improve-feature specs/<name>.md` — characterization net first → plan (you
-  approve) → change → tests → acceptance → fix loop → perf → summary.
+  approve) → target tests first (red) → change (green) → acceptance → fix loop → perf → summary.
 - `/genesis:optimize-feature specs/<name>.md` — baseline + profile → safety net →
   hypothesis → ONE change → re-measure vs baseline (revert if it doesn't beat noise)
   → repeat → summary.
@@ -163,6 +164,15 @@ writing (a spec is a few KB). If your bill runs high:
   deliberate without imposing one look. Invoke directly with "use the ux skill on
   this screen" if you want it on a plain prompt.
 
+- **standards-code / standards-security / standards-performance / standards-ui /
+  standards-logging** — the detailed Genesis Standards, split by topic. CLAUDE.md
+  keeps a short always-on core and a table saying which of these to load for which
+  work; commands and agents load them before writing or reviewing code. Hidden from
+  the `/` menu (Claude loads them; you don't need to).
+- **finding-confidence** — the disprove-then-score filter `review`, `security-check`
+  and `hack` run on every finding: 70+ is reported, 40–69 is listed as unverified,
+  below 40 is dropped (critical security findings are never dropped silently).
+
 ## Agents (used by the commands — you don't call these directly)
 test-writer · characterization-tester · perf-profiler · e2e-tester · bug-fixer.
 They read the actual test/lint/benchmark commands from the project's `CLAUDE.md`,
@@ -188,22 +198,20 @@ Bump `version` in `.claude-plugin/plugin.json`, push, and users run
 a CLAUDE.md already written into a project. Re-run `/genesis:setup` (or edit by
 hand) to pull template changes into an existing project's CLAUDE.md.
 
-## Repo layout
+## Plugin layout
 ```
-genesis/
+plugins/genesis/
 ├── .claude-plugin/
-│   ├── plugin.json          # manifest (name, version, components)
-│   └── marketplace.json     # self-referencing catalog (source "./")
+│   └── plugin.json          # manifest (name, version, metadata)
 ├── commands/                # slash commands → /genesis:<name>
 ├── agents/                  # subagents → genesis:<name>
-├── templates/               # CLAUDE.template.md + spec-template.md (used by setup)
-└── README.md
+├── skills/                  # ux, standards-*, finding-confidence (load on demand)
+├── templates/               # CLAUDE.template.md + spec/roadmap/etc. templates
+└── PLUGIN.md
 ```
+The marketplace catalog lives at the repo root in `.claude-plugin/marketplace.json`.
 
-## Before you publish
-- Replace `YOUR_NAME` / `YOUR_GITHUB_USERNAME` in `plugin.json`, `marketplace.json`,
-  and this README.
-- Push to a public (or team-accessible) git repo named to match the marketplace source.
-- Optional: add `graphify-out/` to consuming projects' `.gitignore` if you trial a code graph.
+Optional: add `graphify-out/` to consuming projects' `.gitignore` if you trial a
+code graph.
 
 MIT.

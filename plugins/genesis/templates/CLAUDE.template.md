@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.19.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.20.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -57,10 +57,24 @@ required" unless stated.
 - Use `/clear` between unrelated tasks to reset context.
 
 ## Standards (apply to every project)
-Durable rules every phase and subagent must respect. These ship in the genesis
-template, so they're inherited by every project. Edit them in the plugin's
-`templates/CLAUDE.template.md` to change them everywhere; add project-specific
+Durable rules every phase and subagent must respect. The always-on core is below.
+The detailed standards live in the plugin as skills that load when the work calls
+for them — they are just as binding. **Before writing or reviewing code, load the
+ones that apply:**
+
+| Work involves | Load skill |
+|---|---|
+| Writing, refactoring, or reviewing any code | `genesis:standards-code` |
+| Endpoints, auth/permissions, user input, secrets, queries | `genesis:standards-security` |
+| Queries, lists, collections, caching, metered services (Firebase, Supabase, paid APIs) | `genesis:standards-performance` |
+| Screens, components, forms, icons/assets | `genesis:standards-ui` + `genesis:ux` |
+| Error handling or logging | `genesis:standards-logging` |
+
+When delegating to a subagent, name the skills it should load in the prompt.
+To change a standard everywhere, edit its skill in the plugin; add project-specific
 standards under Conventions below.
+
+### Always-on core
 
 - **Be direct and honest, not agreeable.** Say what's true, not what's easy to
   hear. If the user is wrong, say "you're wrong" and explain why — don't soften a
@@ -75,147 +89,9 @@ standards under Conventions below.
   own work: the failure mode is an agent that writes code and its tests with the
   same blind spot because nothing challenged the assumption.
 
-- **Performance is a first-class concern, always.** Don't ship an obviously
-  wasteful approach and defer performance to "later." Prefer algorithms and data
-  access patterns that scale; flag anything with quadratic blow-up, N+1 access, or
-  unbounded growth even when not explicitly asked.
-- **Be cost-conscious with metered third-party services** (Firebase/Firestore,
-  Supabase, hosted queues, paid APIs, etc.). Minimize billable operations: batch
-  reads/writes, cache where safe, avoid per-item round-trips and chatty polling,
-  and prefer a single query over many. When a change adds billable calls, say so
-  and estimate the impact rather than silently increasing usage.
-- Call out, don't silently accept, a tradeoff that improves one of
-  {correctness, performance, cost} at a real expense to another.
-
-- **DRY — reuse before you write.** Before adding a function, widget, model, or
-  service, search for an existing one that already does it (or nearly does it) and
-  extend that instead. Never copy-paste a block and tweak it. If the same logic
-  appears a third time, extract it.
-  **Search order:** (1) this project's own code, (2) libraries already in this
-  project's dependencies, (3) any shared library this project has *explicitly*
-  opted into under "Component libraries" below. Never introduce a new dependency
-  to satisfy DRY without asking.
-  **Before building anything, search for what already exists.** If an **exact**
-  match (behaviorally identical component or function — same job, different names
-  still counts) is already in the codebase, reuse it, or extract it into a shared
-  component so there's one copy; ask before extracting. If something is only
-  **partially similar**, note it but leave it separate by default (see KISS) —
-  merging merely-similar code into one flag-driven abstraction is worse than the
-  duplication. Copy-paste of an existing block is a defect, not a shortcut.
-- **KISS — but not at the cost of readability.** DRY loses to KISS when they
-  conflict. Do NOT collapse similar-looking code into one function bristling with
-  boolean flags, optional params, and branches — that's harder to maintain than the
-  duplication it removed. Two clear functions beat one clever one. Prefer
-  extracting a genuinely shared *concept*, not merely shared *characters*.
-  Duplication is cheaper than the wrong abstraction: if two blocks look alike but
-  change for different reasons, leave them alone and say why.
-- **Enums over magic strings.** Any fixed set of values — status, role, type,
-  gender, state — is an enum (or sealed/const type), never a bare string or int
-  compared with `==`. Prefer `if (gender == Gender.male)` over
-  `if (gender == 'male')`. Strings are allowed only at the boundary (JSON, DB,
-  API); parse them into the enum on the way in and serialize on the way out, in
-  one place. Exhaustive `switch` over an enum is preferred to if/else chains, so
-  the compiler catches a missing case when a value is added later.
-
-- **Security is not optional and not a feature — it's a property of everything.**
-  - **The server is the only trust boundary.** Client-side validation is for UX;
-    it can always be bypassed. Every rule enforced on the client MUST be enforced
-    again on the server. Never trust input that arrived over the wire.
-  - **Auth on every private endpoint.** Private/authenticated endpoints verify the
-    caller's identity AND that they're authorized for *this* resource (an
-    authenticated user is not automatically permitted). Deny by default: an
-    endpoint with no explicit auth decision is treated as needing auth, not as
-    public. Return 401 vs 403 correctly and don't leak which.
-  - **Validate and sanitize all input, server-side.** Reject malformed input at
-    the boundary; validate type, range, length, and shape. Use parameterized
-    queries / the ORM's safe paths — never string-built queries. Encode/escape
-    output to prevent injection (SQL, XSS, command). Treat file uploads and
-    redirects as hostile until checked.
-  - **No secrets in source, ever.** API keys, tokens, connection strings, and
-    credentials come from environment/config (`.env`, platform secrets), which is
-    git-ignored. Never log secrets or PII. If a secret would appear in code,
-    output, or a commit, stop and flag it.
-  - **Least privilege.** Request the narrowest scopes/permissions that work;
-    don't run or connect as an admin/superuser for ordinary operations.
-  - **Fail closed.** On an auth or validation error, deny access — never fall
-    through to permitted. Don't expose stack traces or internal detail in errors
-    sent to clients.
-
-- **Out-of-scope findings: capture, don't act.** When you notice something
-  important that is NOT part of the current task — a hardcoded secret, a bug, a
-  security hole, a performance trap, tech debt — do NOT fix it inline (that's scope
-  creep and breaks the touch budget) and do NOT let it vanish into a summary.
-  **Append it to `FINDINGS.md`** at the repo root (create it if missing) with
-  severity, location, what it is, and a suggested next step, then continue your
-  actual task. The backlog is worked separately via `/genesis:findings`.
-  **Exception — a committed/hardcoded secret is live exposure, not a note for
-  later:** log it AND stop to tell me immediately, because it needs rotating and
-  purging from history, which can't wait for a backlog review.
-
-- **Descriptive, self-documenting names (all code, front and back).** A name must
-  say what the thing is without decoding. Booleans read as questions
-  (`isTrueFalseQuestion`, `canManageQuiz` — not `flag`, not `isTF`). No cryptic
-  abbreviations, no single letters except loop indices. Clear beats both cryptic
-  AND bloated — don't pad names to be "descriptive"; say exactly what it is.
-  **If you can't tell what a name means from context, that is itself the finding:**
-  say so plainly ("I can't tell what `isTrueFalse` refers to — true/false *what*?")
-  and propose a clearer name, rather than silently accepting it. Not understanding a
-  name is a signal to rename it, not to move on.
-
-- **No emojis. Anywhere.** Not in UI, not in user-facing copy ("Thanks for
-  registering 🎉" is banned), not in comments, logs, or commit messages. For
-  iconography use **SVG icons**, never an emoji standing in for an icon.
-
-- **Use the project's shared UI components — this is mandatory, not preferred.**
-  The project's component manifest (`COMPONENTS.md`) lists the house components and
-  what each does. If a house component exists for a UI primitive (button, input,
-  card, modal, etc.), a raw HTML/framework-native equivalent is **banned** — use
-  the house component. Read `COMPONENTS.md` before writing UI; don't scan the whole
-  codebase to rediscover components each time.
-  - **Repeated markup is a component.** The same structural block appearing 2+
-    times (in a file or across the project) should be extracted into a reusable
-    component — flag it and propose the extraction.
-  - **Gap handling: extend, never fork.** If a house component doesn't do something
-    you need (an icon variant, a danger tone), do NOT abandon it and hand-roll a
-    raw element or a second parallel component. Propose **adding the capability to
-    the existing shared component** and ask me before doing it (mid-session is
-    fine). One source of truth per primitive.
-  - When you create or change a shared component, **update `COMPONENTS.md`** so its
-    capabilities/limits stay accurate (see the manifest write-back rule).
-
-- **Icons and assets: ask, don't invent, don't emoji.** When an icon/image is
-  needed: if the project uses an icon library, ask which icon (I give a name); if
-  it uses standalone SVGs/assets, ask me to provide the file. **Never substitute an
-  emoji, invent an SVG, or ship a placeholder.** If the asset isn't provided,
-  implement everything around it, log a finding (`FINDINGS.md`), and treat the
-  feature as **blocked-on-asset** — it can't be marked `done` until the asset is in
-  (see the completion gate in the build orchestrators). Extract an asset from a
-  design only if I explicitly ask (and note a PNG design may not yield a usable
-  vector).
-
-- **New interactive components are born accessible.** When you build a genuinely
-  new interactive component (not covered by a house component), it must be
-  accessible from the start, not retrofitted later: keyboard reachable and operable
-  (Tab to it, Enter/Space/arrows as appropriate), correct semantic role
-  (`role=`/native element), visible focus state, labels/`aria-*` where meaning isn't
-  conveyed by text, and sensible focus management (e.g. focus moves into a dialog
-  and back on close). This is why house components are mandatory — they already bake
-  this in; a hand-rolled equivalent that drops it is a defect. When such a component
-  is added to `COMPONENTS.md`, note its accessibility support like any other
-  capability.
-
-- **Follow the project's existing structure.** Before creating a new file or
-  deciding where code goes, look at how the project already organizes this kind of
-  thing and **match it.** If API calls for a service live in one file, add the new
-  call there — don't spin up a parallel file. Put models where models already live,
-  follow the existing foldering, layering, and naming patterns. Detect the
-  convention from the actual codebase (find the existing file/folder and conform),
-  don't impose a structure that seems reasonable in isolation — that's how a
-  codebase grows two or three competing patterns for the same thing. Introduce a
-  new structural pattern ONLY if the project has none for this, if I explicitly ask,
-  or if `/genesis:review` flagged the current structure for change. If you think the
-  existing structure is genuinely wrong, don't quietly work around it — log a
-  finding (`FINDINGS.md`) or raise it, don't fork the pattern.
+- **No secrets in source, ever.** Keys, tokens, and credentials come from
+  environment/config, never code, logs, or commits. If you find one hardcoded or
+  committed, stop and tell me immediately — it needs rotating, not a backlog entry.
 
 - **Modifying existing code: change only what was asked.** When editing a file
   that already exists, add and modify exactly what the spec names — and leave
@@ -228,35 +104,21 @@ standards under Conventions below.
   most destructive thing you can do; a modification that changes more than its
   spec named is a defect, not initiative.
 
-- **Log failures — through the abstraction, never raw, never secrets.**
-  - Log where a failure is **handled** (the catch that decides what happens), once
-    per failure — not at every layer it passes through. One meaningful entry, not
-    ten.
-  - **Never swallow errors silently.** An empty catch, or one that hides a failure
-    with no log and no rethrow, is a defect. Every caught failure is either
-    handled-and-logged or rethrown.
-  - Log through the project's **logger abstraction** (see CLAUDE.md → Logging),
-    never `print` / `console.log` / direct SDK calls. This is what lets the sink
-    and level change per environment from one place.
-  - Use **levels**: error (failed, needs attention) / warn (recovered or degraded)
-    / info (notable events) / debug (dev only). Production runs at warn/error.
-  - Include **actionable context** — the operation, relevant identifiers, the
-    error type/message — but **never secrets, tokens, credentials, or PII** (this
-    overrides the urge to "log everything to debug it"). Log an id, not the record.
-  - Internal detail (stack traces) goes to the log sink, **never to a client
-    response** (ties to the security standard).
-  performance/cost rules above, at the data layer specifically:
-  - **Never load unbounded result sets.** List/query endpoints paginate (limit +
-    cursor/offset); no "fetch all rows/documents" that grows with the table.
-  - Ensure queries are backed by an **index**; flag any filter/sort on an
-    unindexed field.
-  - Avoid N+1 access across a collection; batch or join.
-  - Don't hold whole collections in memory to filter in code — filter at the
-    query.
-  - Prefer stateless request handling (state in the data store, not the process)
-    so the service can run behind more than one instance.
-  - Flag any operation whose cost grows with total data size rather than with the
-    page being served.
+- **Out-of-scope findings: capture, don't act.** When you notice something
+  important that is NOT part of the current task — a hardcoded secret, a bug, a
+  security hole, a performance trap, tech debt — do NOT fix it inline (that's scope
+  creep and breaks the touch budget) and do NOT let it vanish into a summary.
+  **Append it to `FINDINGS.md`** at the repo root (create it if missing) with
+  severity, location, what it is, and a suggested next step, then continue your
+  actual task. The backlog is worked separately via `/genesis:findings`.
+  **Exception — a committed/hardcoded secret is live exposure, not a note for
+  later:** log it AND stop to tell me immediately, because it needs rotating and
+  purging from history, which can't wait for a backlog review.
+
+- **No emojis. Anywhere.** Not in UI, not in user-facing copy ("Thanks for
+  registering 🎉" is banned), not in comments, logs, or commit messages. For
+  iconography use **SVG icons**, never an emoji standing in for an icon.
+
 
 <!-- =================================================================== -->
 <!-- PER-PROJECT — FILL THIS IN  (the only section that changes per repo) -->

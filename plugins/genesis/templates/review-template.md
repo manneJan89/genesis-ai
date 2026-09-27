@@ -12,7 +12,7 @@ If nothing serious was found, say that plainly.
 
 ### 1. <short title>
 - **Severity**: blocker | major | minor | optional
-- **Confidence**: confirmed | suspected (needs verification)
+- **Confidence**: <0–100> — for 70–89, the one thing that would confirm it
 - **Category**: correctness | performance/cost | standards | test coverage | maintainability
 - **Location**: `path/to/file.dart:123` (`functionName`)
 - **What**: what is actually wrong.
@@ -22,6 +22,13 @@ If nothing serious was found, say that plainly.
 
 ### 2. <short title>
 (repeat)
+
+## Unverified — worth a look
+Scored 40–69: the pattern is there but unproven. Not routed to a fix until confirmed.
+
+- `path/to/file:line` — <suspicion> — confirm by: <what would prove or kill it>
+
+<N> speculative candidates (below 40) dropped.
 
 ## Performance hypotheses (unmeasured)
 Listed separately because nothing here has been profiled. Each needs measurement

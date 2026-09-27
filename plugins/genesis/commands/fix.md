@@ -1,12 +1,13 @@
 ---
 description: Investigate, reproduce, and fix a reported bug — failing test first
 argument-hint: [description of the bug]
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, Skill
 ---
 
 Handle this reported bug: $ARGUMENTS
 
-Read CLAUDE.md first for the project's commands, standards, and codebase map.
+Read CLAUDE.md first for the project's commands, standards, and codebase map, and
+load the Genesis standards skills that apply to the code you'll touch.
 The rule that governs this whole flow: **do not fix anything you have not first
 reproduced with a failing test.** A fix without a reproduction is a guess.
 

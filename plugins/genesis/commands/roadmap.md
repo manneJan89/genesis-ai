@@ -1,7 +1,7 @@
 ---
 description: Plan a multi-slice system — interview, settle cross-cutting decisions, and break it into specs
 argument-hint: [system/epic name, or blank to show status]
-allowed-tools: Read, Write, Edit, Grep, Glob
+allowed-tools: Read, Write, Edit, Grep, Glob, Skill
 ---
 
 Plan the system: $ARGUMENTS
@@ -28,7 +28,9 @@ If the request turns out to be a single feature, say so and tell me to use
 `/genesis:spec` instead. Don't manufacture slices.
 
 ## 1. Explore first (read-only)
-Read CLAUDE.md (Standards, Conventions, Component libraries, Codebase map). Check
+Read CLAUDE.md (Standards, Conventions, Component libraries, Codebase map), and
+load `genesis:standards-security` and `genesis:standards-performance` — cross-cutting
+decisions (auth, schema, pagination, metered-service cost) are settled here. Check
 for existing code, models, or services this system would touch or reuse — per the
 DRY standard, existing components must be named as dependencies, not rebuilt.
 

@@ -25,6 +25,20 @@ Do NOT touch my **PER-PROJECT block** (Project, Commands, Component libraries,
 Conventions, Codebase map, Logging destinations, Test baseline) — those are mine
 and project-specific. Sync only the shared rule sections.
 
+### Migrating a pre-0.20 CLAUDE.md
+From v0.20.0 the detailed Standards moved out of CLAUDE.md into the plugin's
+`standards-*` skills; CLAUDE.md keeps a short always-on core plus a table saying
+which skill to load when. If this project's CLAUDE.md still has the long Standards
+section, the sync replaces it with the new short one. Before doing that:
+- compare each old rule against the new always-on core and the
+  `${CLAUDE_PLUGIN_ROOT}/skills/standards-*/SKILL.md` files — the rules were moved
+  there word for word, so a matching rule is covered and can be removed safely;
+- any rule that does **not** match (one I added or edited locally) is a
+  customization — move it into **Conventions** (the per-project block) so it
+  survives, and list it for me.
+Show this as its own group in the summary below ("Moved to skills" / "Kept as
+your Conventions").
+
 ## 2. Show me the diff and ask
 Present a clear, grouped summary:
 - **New rules to add** (e.g. "Out-of-scope findings: capture to FINDINGS.md")
