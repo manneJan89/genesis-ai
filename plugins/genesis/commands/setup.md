@@ -93,6 +93,37 @@ setup side-effect.
   intended path in CLAUDE.md. Code will log through it, never directly — so a real
   sink can be swapped in later with a one-file change. Offer to create the
   abstraction stub now (with my okay).
+- The abstraction **redacts before it writes**: anything credential-shaped
+  (connection strings with a password in them, keys, tokens, auth headers) is
+  masked at this one seam, so an accidental `log(config)` can't leak a secret. If
+  the project already has a logger, check whether it redacts; if not, log a
+  finding.
+
+**Data safety (blocking — do not skip).** Fill the Data safety section of
+CLAUDE.md by asking me and by reading config *structure*. Hard rules for this
+step: **never connect to a database to test it, and never print, echo, or read
+out a secret value.** Look at which env/config files exist and which variable
+names they define, not their values. Never open an env or secrets file with Read
+or `cat`: that puts every value into your context, which is itself a leak. To see
+names only, use a command that strips values, e.g. `sed 's/=.*//' .env`.
+- Which databases does the project use, and which one do dev sessions point at
+  (emulator, local DB, staging, production)?
+- **Can this machine reach production?** Ask me directly, and look for signals
+  without reading values: production project IDs or hostnames in non-secret
+  config, a `.env.production` or similar on disk, prod variable names in the dev
+  env file. If production is reachable, or you can't rule it out, **warn me
+  loudly**, mark it `YES` in CLAUDE.md, and log a high finding: the fix is to move
+  production credentials off this machine and point dev at an emulator, a local
+  DB, or staging. Prompt rules can't make reachable production data safe; only
+  not having the credentials can.
+- Backups: what backs up each database, how often, and are the backups stored
+  where the credentials on this machine can't delete them? When was a restore
+  last tested? Missing or untested backups → high finding.
+- Repo: is `main` protected against force-push and deletion? If not, log a
+  medium finding with the fix (a branch protection rule; that's a GitHub setting
+  you apply, not the agent).
+- Genesis does not set up backups, secret managers, or branch protection itself —
+  those are your infrastructure. It records what exists and flags what's missing.
 - Ask how the project distinguishes **environments** (dev vs prod) and fill the
   level/destination matrix. If unknown, default to dev=debug/console,
   prod=warn+error/console until a sink is added.

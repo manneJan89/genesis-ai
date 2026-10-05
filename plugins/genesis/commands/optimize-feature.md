@@ -29,6 +29,13 @@ change the implementation freely while proving behavior stayed identical.
 Enter plan mode. Pick the top hotspot worth attacking (critical path, meaningful
 share of the metric). State a specific hypothesis: "X is slow because Y; doing Z
 should cut it by roughly N." Stop for my approval before changing code.
+
+**Data operations:** if the plan includes anything that writes to data outside a
+local or emulator database (migration, backfill, bulk update or delete, data-fix
+script, import), name it in the hypothesis and apply the **data-operation gate** from
+`genesis:standards-security`: you build and test it locally, I run it against
+real data after confirming a backup.
+
 - *If a queryable code graph exists*, use it to see what depends on the hotspot
   before you change it, so an optimization doesn't quietly break a caller you
   didn't know about.

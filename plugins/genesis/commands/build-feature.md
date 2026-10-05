@@ -59,6 +59,12 @@ in Phase 3 are written against it before any logic exists. Map the work to each
 acceptance criterion. Stop and let me approve the touch budget before writing code.
 For anything large, propose reviewable chunks rather than one big pass.
 
+**Data operations:** if the plan includes anything that writes to data outside a
+local or emulator database (migration, backfill, bulk update or delete, data-fix
+script, import), name it in the plan and apply the **data-operation gate** from
+`genesis:standards-security`: you build and test it locally, I run it against
+real data after confirming a backup.
+
 ## Phase 2 — Design gate (UI features only)
 If this feature renders UI, **consult the `ux` skill** and apply its reasoning
 (hierarchy, spacing, the required states, affordance, accessibility, avoiding the

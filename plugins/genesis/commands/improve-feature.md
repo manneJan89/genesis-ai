@@ -26,6 +26,12 @@ characterization tests stay green throughout. Everything not on that list stays
 untouched. Stop for my approval of the touch budget before writing. Prefer small
 reviewable chunks over one big pass.
 
+**Data operations:** if the plan includes anything that writes to data outside a
+local or emulator database (migration, backfill, bulk update or delete, data-fix
+script, import), name it in the plan and apply the **data-operation gate** from
+`genesis:standards-security`: you build and test it locally, I run it against
+real data after confirming a backup.
+
 ## Phase 3 — Target tests first (red)
 Skip for a pure **refactor** (no new behavior — the characterization net is the
 test). Otherwise, scaffold any new public surface named in the plan (signatures

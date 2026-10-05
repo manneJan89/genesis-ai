@@ -50,6 +50,15 @@ Delegate to the **bug-fixer** subagent with the failing test and your hypothesis
 The fix must be **minimal** and address the root cause, not mask the symptom. No
 refactoring beyond what the fix requires; no scope creep.
 
+**Data operations:** if the fix needs anything that writes to data outside a
+local or emulator database (migration, backfill, bulk update or delete, data-fix
+script, import), stop at the code fix and apply the **data-operation gate** from
+`genesis:standards-security`: you build and test it locally, I run it against
+real data after confirming a backup.
+
+Repairing already-corrupted production data is itself a data operation: write the
+repair script, test it locally, and hand it over under the same gate.
+
 **Cap at 3 attempts.** If the reproducing test isn't green after three fix
 attempts, stop and report the failed hypotheses and what you've ruled out rather
 than trying more variations. A bug that resists three targeted fixes usually needs
