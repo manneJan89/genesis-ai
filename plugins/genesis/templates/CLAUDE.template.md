@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.22.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.23.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -133,7 +133,10 @@ stop and load the skill.
 
 - **"Stop" means the task ends.** When a rule says stop, or you find a critical
   or high-severity security problem, end the task and tell me. Mentioning it and
-  carrying on is not stopping. Don't resume until I say so.
+  carrying on is not stopping. Don't resume until I say so. The same goes for a
+  denied or unapproved command: it's a decision, not an obstacle. Never route
+  around it by rephrasing it, wrapping it (`bash -c`, a full program path, a new
+  script), or reaching the same result another way. Tell me what you needed and why.
 
 - **Modifying existing code: change only what was asked.** When editing a file
   that already exists, add and modify exactly what the spec names — and leave
@@ -222,6 +225,8 @@ Filled by `/genesis:setup`; keep it current. Agents read it before any data work
 - **Last restore test**: <date, or "never" — an untested backup is a hope>
 - **Repo protection**: <branch protection on main: no force-push, no deletion;
   any mirror>
+- **Permission guardrails**: <installed in .claude/settings.json (Genesis vX) |
+  declined> — deny/ask rules Claude Code enforces itself; see `/permissions`
 
 ## Component libraries
 Which shared UI/component library this project uses. **Default: none.**

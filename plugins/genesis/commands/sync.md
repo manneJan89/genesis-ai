@@ -32,6 +32,15 @@ added in v0.22.0), add it, then fill it by running that section's step from
 connect to a database or print a secret value). Never overwrite a section that
 already exists.
 
+**Permission guardrails.** Compare the project's `.claude/settings.json` and
+`.claude/settings.local.json` against
+`${CLAUDE_PLUGIN_ROOT}/templates/permissions.template.json`. If the template has
+`deny` or `ask` rules the project lacks, list them in plain words and offer to add
+them, following the merge rules in setup's Permission guardrails step (merge,
+never replace; never add `allow` rules; say what they don't cover). If CLAUDE.md
+→ Data safety records that I declined the guardrails, mention the new rules once
+and don't push.
+
 ### Migrating a pre-0.20 CLAUDE.md
 From v0.20.0 the detailed Standards moved out of CLAUDE.md into the plugin's
 `standards-*` skills; CLAUDE.md keeps a short always-on core plus a table saying

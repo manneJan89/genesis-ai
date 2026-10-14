@@ -98,14 +98,20 @@ setup side-effect.
   masked at this one seam, so an accidental `log(config)` can't leak a secret. If
   the project already has a logger, check whether it redacts; if not, log a
   finding.
+- Ask how the project distinguishes **environments** (dev vs prod) and fill the
+  level/destination matrix. If unknown, default to dev=debug/console,
+  prod=warn+error/console until a sink is added.
 
 **Data safety (blocking — do not skip).** Fill the Data safety section of
 CLAUDE.md by asking me and by reading config *structure*. Hard rules for this
 step: **never connect to a database to test it, and never print, echo, or read
 out a secret value.** Look at which env/config files exist and which variable
 names they define, not their values. Never open an env or secrets file with Read
-or `cat`: that puts every value into your context, which is itself a leak. To see
-names only, use a command that strips values, e.g. `sed 's/=.*//' .env`.
+or `cat`: that puts every value into your context, which is itself a leak. Get
+variable names from `.env.example` (or a similar names-only file) if one exists;
+otherwise ask me to list them. Don't try other ways of reading the real env
+file: once the permission guardrails below are installed, Claude Code blocks it
+anyway, and routing around that is a violation in itself.
 - Which databases does the project use, and which one do dev sessions point at
   (emulator, local DB, staging, production)?
 - **Can this machine reach production?** Ask me directly, and look for signals
@@ -124,9 +130,45 @@ names only, use a command that strips values, e.g. `sed 's/=.*//' .env`.
   you apply, not the agent).
 - Genesis does not set up backups, secret managers, or branch protection itself —
   those are your infrastructure. It records what exists and flags what's missing.
-- Ask how the project distinguishes **environments** (dev vs prod) and fill the
-  level/destination matrix. If unknown, default to dev=debug/console,
-  prod=warn+error/console until a sink is added.
+
+**Permission guardrails (offer; I decide).** Claude Code's own permission rules
+are enforced by Claude Code, not the model, in every mode, so no reasoning or
+retrying gets past them. Offer to merge Genesis's rule set from
+`${CLAUDE_PLUGIN_ROOT}/templates/permissions.template.json` into the project's
+`.claude/settings.json`:
+- **Deny:** destructive git (force-push, deleting remote branches, `reset --hard`,
+  `clean -f`, `branch -D`, history rewrites), `gh repo delete`, Firebase
+  delete/remove commands, and Claude's file tools reading env and secret files
+  (`.env`, `.env.local`, `.env.production`, key and service-account files).
+  `.env.example` stays readable.
+- **Ask:** any command carrying `--delete`, `--drop`, `--purge`, `--wipe` or
+  `--truncate` (this is what catches a project script run with a destructive
+  flag); git commands that discard work; database command-line tools; migrations;
+  `firebase deploy`; shell commands touching env files; and `bash -c` / `sh -c` /
+  `zsh -c` (a fresh shell is the usual way around a rule, so it always prompts).
+  Ask rules prompt even in auto mode. Note the env-file read deny also blocks
+  `cat`, `grep`, `sed` and `head` on those files, not only Claude's Read tool.
+- **Project-specific:** look at the project's own scripts (`package.json`
+  scripts, Makefile targets, `melos`/`pubspec` scripts) for names like
+  `reset`, `drop`, `wipe`, `purge`, `seed`, `migrate`, `delete`, `restore`, and
+  propose an **ask** rule for each (e.g. `Bash(npm run db:reset*)`). Generic rules
+  can't know your scripts; this is where the real coverage comes from.
+
+How to apply it:
+- **Merge, never replace.** Keep every rule already in the file. Add only `deny`
+  and `ask` rules; never add an `allow` rule.
+- Show me the rules grouped as above, in plain words, and get my approval. I can
+  drop any rule (for example, if `firebase deploy` prompting is too much
+  friction). Ask whether to write to `.claude/settings.json` (committed, shared
+  with anyone on the repo) or `.claude/settings.local.json` (just me).
+- **Say plainly what this doesn't cover:** commands run another way (`bash -c
+  '…'`, a full program path, `git -c … push`), a script with a destructive action
+  hard-coded inside and no flag, and anything outside Claude Code. These rules are
+  a seatbelt, not isolation: production credentials off this machine is still the
+  real protection.
+- Record the result in CLAUDE.md → Data safety ("Permission guardrails:
+  installed, Genesis vX" or "declined"), and tell me to check them with
+  `/permissions` and start a new session so they load.
 
 Finally: if this is an **existing codebase with little or no test coverage**, tell
 me that `/genesis:improve-feature`'s characterization tests become especially

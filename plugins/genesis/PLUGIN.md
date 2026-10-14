@@ -155,6 +155,31 @@ writing (a spec is a few KB). If your bill runs high:
   more than small slices that pass first try. Lean on roadmap slicing.
 - `/clear` between unrelated features so you're not re-processing stale context.
 
+## Safety: what's enforced and what's only instructed
+Genesis's rules in CLAUDE.md are instructions. A model can reason its way past an
+instruction, so the protections are layered, strongest first:
+
+1. **No production credentials on the dev machine** (your infrastructure; setup's
+   Data safety step checks and warns). The only layer that can't be bypassed.
+2. **Branch protection on GitHub** for `main` (you set it; setup checks).
+3. **Permission guardrails** (`templates/permissions.template.json`, offered by
+   `/genesis:setup` and `/genesis:sync`). Enforced by Claude Code itself in every
+   mode. Tested against Claude Code 2.1.299:
+   - denied: force-push (incl. `--force-with-lease`, `-f`, env-prefixed and
+     compound forms), `push --delete`, `reset --hard`, `clean -f`, `branch -D`,
+     and reading `.env`/`.env.local`/`.env.production` or key files, by Claude's
+     file tools *and* by `cat`, `grep`, `sed`, `head`;
+   - prompts (even in auto mode): any command with `--delete`/`--drop`/
+     `--purge`/`--wipe`/`--truncate`, `branch -d`, `source .env`, `bash -c` /
+     `sh -c`, database command-line tools, migrations, `firebase deploy`;
+   - still allowed: `git clean -n`, `--dry-run`, `.env.example`.
+   - **Not covered:** `git push origin :branch` (the colon delete form can't be
+     expressed as a rule), a full program path for git (`/usr/bin/git …`), `git -c
+     … push`, and a script with a destructive action hard-coded inside and no
+     flag. Rule matching is case-sensitive.
+4. **Genesis's rules** (stop means stop, never use found credentials, never act
+   destructively on live data, never route around a denial).
+
 ## Skills
 - **ux** — design/UX reasoning (visual hierarchy, spacing & rhythm, the required UI
   states, affordance & feedback, form UX, accessibility, avoiding the generic
