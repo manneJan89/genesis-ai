@@ -52,6 +52,7 @@ reference and worked examples.
 | Set up Genesis in a project (once) | `/genesis:setup` |
 | Plan a whole system (multi-slice) | `/genesis:roadmap <system>` |
 | See where I left off | `/genesis:roadmap` (no arguments) |
+| Stop mid-task, or carry on from the last session | `/genesis:handoff` (the build commands also keep `HANDOFF.md` current on their own) |
 | Build something new | `/genesis:spec <feature>` → `/genesis:build-feature specs/<name>.md` |
 | Find out what's wrong with existing code | `/genesis:review <thing>` |
 | Turn a handed design into editable HTML | `/genesis:design <screen>` |

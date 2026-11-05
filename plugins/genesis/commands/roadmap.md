@@ -8,7 +8,10 @@ Plan the system: $ARGUMENTS
 
 ## If called with no arguments
 List the roadmaps in `specs/roadmaps/`, and for each show its **Next up** slice
-and slice statuses. Then stop. This is the "where did we leave off" view.
+and slice statuses. If `HANDOFF.md` exists at the repo root, show its task, phase
+and **Next step** first, since it's the more precise "where we stopped" (work in
+progress inside a slice), and say whether its **Branch** matches the current one.
+Then stop. This is the "where did we leave off" view.
 
 ## What this command is for
 A **roadmap** plans a system too big for one spec (a quoting module, a booking

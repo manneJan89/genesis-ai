@@ -203,6 +203,7 @@ Show me the final CLAUDE.md, then tell me the available commands:
 - `/genesis:spec <feature>` → `/genesis:build-feature specs/<name>.md`  (new feature)
 - `/genesis:audit-feature <thing>` → `/genesis:improve-feature specs/<name>.md`  (change existing)
 - `/genesis:audit-feature <thing>` (type=refactor) → `/genesis:optimize-feature specs/<name>.md`  (make it faster)
+- `/genesis:handoff`  (stopping mid-task; the build commands also write `HANDOFF.md` on their own so the next session can carry on)
 
 Remind me that I can re-run `/genesis:setup` anytime the stack changes, and that
 updating the plugin (`/plugin marketplace update genesis`) refreshes the agents and

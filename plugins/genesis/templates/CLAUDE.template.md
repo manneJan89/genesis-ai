@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.23.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.24.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -27,6 +27,8 @@ not share a conversation.
 - Make it faster: `/genesis:audit-feature <thing>` (type=refactor) →
   `/genesis:optimize-feature specs/<name>.md`
 - Fix a reported bug: `/genesis:fix <bug>`
+- Stopping mid-task, or picking up a previous session's work: `/genesis:handoff`
+  (or `/genesis:handoff resume`).
 - Find problems: `/genesis:review`, `/genesis:security-check`, `/genesis:hack`
 
 Don't write implementation code for a feature until an approved spec exists in `specs/`.
@@ -159,6 +161,16 @@ stop and load the skill.
   **Exception — a leaked secret or a critical/high security problem is not a note
   for later:** log it AND stop (the task ends, per "Stop means the task ends"),
   because it needs rotating and purging, which can't wait for a backlog review.
+
+- **Session handoff: read it first, trust it second.** If `HANDOFF.md` exists at
+  the repo root, read it before anything else, then check it against git before
+  acting on it: is its **Branch** the current branch, what was committed since its
+  **HEAD when written**, what's uncommitted, and is its **Next step** already done?
+  If the note and the repo disagree, the repo wins: tell me what differs. A
+  handoff from another branch isn't yours; say so and leave it. Approvals don't
+  carry over between sessions: a step that needed my go-ahead still needs it. The
+  build commands keep the file current at phase boundaries and delete it when the
+  work is done; if you stop mid-task outside a command, offer `/genesis:handoff`.
 
 - **No emojis. Anywhere.** Not in UI, not in user-facing copy ("Thanks for
   registering 🎉" is banned), not in comments, logs, or commit messages. For

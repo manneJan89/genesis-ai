@@ -55,6 +55,7 @@ Start from what you're trying to do:
 | Audit security across the app | `/genesis:security-check [scope]` | Attacker's-eye, checklist-driven vulnerability report routed to `/genesis:fix` |
 | Fix a reported bug | `/genesis:fix <what's broken>` | A failing test that reproduces it, a minimal fix, and that test left behind as a regression guard |
 | Make working code faster | `/genesis:audit-feature <thing>` (Change type = `refactor`) → `/genesis:optimize-feature specs/<name>.md` | Measured before/after numbers, behavior provably unchanged |
+| Stop mid-task, or carry on from a previous session | `/genesis:handoff` (or `resume`) | `HANDOFF.md`: task, phase, the exact next step, checked against git by the next session |
 
 Rules of thumb:
 - **Every code change starts with a spec.** New code → `spec`. Existing code → `audit-feature`.
@@ -113,6 +114,15 @@ Rules of thumb:
   shared component while keeping behavior. Render-surface audit (not behavioral),
   new design written to `design/` and approved before code, behavior netted, new
   features found are logged not built. Multi-screen redesign → use a roadmap.
+- `/genesis:handoff [resume|clear]` — writes `HANDOFF.md`, a one-page note of what
+  this session was busy with, how far it got, and the exact next step, so the next
+  session carries on instead of rediscovering. The build commands (build-feature,
+  improve-feature, redesign, optimize-feature, fix) write it at every phase
+  boundary and when they stop early, and delete it when the work is done. Every
+  session reads it first and checks it against git (branch, commits since, what's
+  uncommitted); where they disagree, the repo wins. Approvals never carry over.
+  It's committed with your work (not by Genesis), so commit and push to pick up on
+  another machine. Never holds secrets or production data.
 - `/genesis:improve-feature specs/<name>.md` — characterization net first → plan (you
   approve) → target tests first (red) → change (green) → acceptance → fix loop → perf → summary.
 - `/genesis:optimize-feature specs/<name>.md` — baseline + profile → safety net →

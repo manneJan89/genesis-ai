@@ -13,6 +13,22 @@ a refactor — **behavior does not change** — so correctness is guarded throug
 and every claimed speedup must be measured, not asserted. Delegate to subagents
 **by name explicitly**.
 
+## Handoff (keep it current as you go)
+This run keeps `HANDOFF.md` current so a later session can carry on if this one
+ends. Format: `${CLAUDE_PLUGIN_ROOT}/templates/HANDOFF.template.md`.
+- **At the start:** if a `HANDOFF.md` exists for different work, tell me before
+  replacing it.
+- **At the end of every phase:** overwrite it with where this run stands (phase
+  reached, done, half-done, the exact next step, open questions, decisions not yet
+  in the spec). Take **Branch** and **HEAD** from git. Keep it short. Don't commit it.
+- **Whenever the run stops early** (waiting for my approval, a gate or stop rule,
+  the fix-loop cap, blocked on an asset, or me telling you to stop): write it
+  before you stop. That is when it matters most. Make **Next step** say what
+  unblocks the work.
+- **When the work is done:** move anything in its decisions or open questions
+  that isn't recorded permanently into the spec, the roadmap or `FINDINGS.md`,
+  then delete `HANDOFF.md`.
+
 ## Phase 1 — Baseline + find the real hotspot
 Delegate to the **perf-profiler** subagent (Mode A) to establish a baseline (with
 spread) and rank the real hotspots. **Record the baseline number in the spec.**
@@ -68,3 +84,6 @@ Report: baseline vs final numbers with spread and total % gain, each change that
 was kept (and its individual contribution), anything tried and reverted and why,
 confirmation the characterization net is still green, and any hotspot left on the
 table as a deliberate call.
+
+If the work is finished, clear `HANDOFF.md` as described under Handoff. If it
+ended blocked, leave it, with **Next step** saying what unblocks it.
