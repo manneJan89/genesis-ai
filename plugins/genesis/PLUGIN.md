@@ -161,8 +161,11 @@ writing (a spec is a few KB). If your bill runs high:
 - The fix loops cap at **3 cycles** — a feature that won't go green is stopped and
   reported rather than regenerating code indefinitely. Runaway loops are the #1
   cost.
-- `e2e-tester` and `characterization-tester` run on **Haiku** and report tersely
-  (no pasted logs). The reasoning agents (`test-writer`, `bug-fixer`) stay on Sonnet.
+- `e2e-tester` runs on **Haiku** and reports tersely (no pasted logs); it runs
+  on every fix cycle, so it's where a cheap model saves the most. The agents
+  whose misses become silent bugs stay on Sonnet: `test-writer`, `bug-fixer`,
+  and `characterization-tester` (a behavior it fails to pin has no safety net,
+  so a later change can break it unnoticed).
 - **Smaller slices win**: a big feature that needs several fix cycles re-emits far
   more than small slices that pass first try. Lean on roadmap slicing.
 - `/clear` between unrelated features so you're not re-processing stale context.
