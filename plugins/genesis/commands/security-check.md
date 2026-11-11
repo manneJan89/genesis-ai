@@ -8,8 +8,14 @@ Run a security audit of: ${ARGUMENTS:-the whole application}
 
 You are **read-only**. You find and report vulnerabilities and route them; you fix
 nothing. Load the `genesis:standards-security` and `genesis:standards-performance` skills
-first — their **Security** and **Scale** rules are the bar you audit against —
+first (with the profile files they load for this project) — they are the bar
+you audit against —
 and read CLAUDE.md for project-specific Conventions.
+
+Security is meant to be built in when a feature is specced and built (with its
+security tests and the build's security pass). This command is for the rest:
+auditing existing code that predates that, and catching what a first draft
+missed.
 
 ## What this is — and isn't
 This is a **structured self-review against common vulnerability classes**, run with
@@ -27,12 +33,23 @@ judging any of it:
 - Query params, headers, cookies, webhooks, message consumers
 - Auth flows (login, register, reset, token refresh, session)
 - Anything reading secrets/config or talking to a database or third party
+- Security rules files (Firestore, RTDB, Storage)
+- Games: Server RPCs, replicated state, save files, mod or downloaded content
+- Native code: every parser of files, packets, or command-line input
 
 List the surface first. A vulnerability in an endpoint you never looked at is the
 one that gets exploited — coverage matters more than depth on any single item.
 
 ## 2. Audit each against the checklist
-For every entry point, work the checklist. Cite file + line for each finding.
+Load `genesis:standards-security`; it loads the profile files listed in
+CLAUDE.md → Profiles. For every entry point, work the checklist below **and**
+the rules of each profile that covers it (MongoDB operator injection and mass
+assignment for `server`, `bypassSecurityTrust*` for `client`, rules ownership
+for `firebase`, RPC validation and authority for `unreal` and `unity`, memory
+safety for `native` and `unreal`). Skip classes that don't apply to the
+project's profiles, and list what you skipped under coverage. For each entry
+point, also check that its security tests exist ("Prove it with tests"); a
+missing test is a finding. Cite file + line for each finding.
 
 **Authentication**
 - Private endpoints actually verify identity (not just assume a session).
@@ -47,7 +64,9 @@ For every entry point, work the checklist. Cite file + line for each finding.
 
 **Input validation & injection**
 - Server-side validation on ALL input (client validation doesn't count).
-- Parameterized queries / safe ORM paths — no string-built SQL/NoSQL.
+- Parameterized queries / safe ORM paths — no string-built SQL/NoSQL, and no
+  request value reaching a MongoDB filter without its type checked (`{"$ne":
+  ""}` matches everything).
 - Output encoded/escaped (XSS); no unsanitized HTML injection.
 - Command/path injection on anything reaching the shell or filesystem.
 - File uploads: type/size checked, stored safely, not executable.
@@ -67,7 +86,8 @@ For every entry point, work the checklist. Cite file + line for each finding.
 
 **Availability / abuse**
 - Rate limiting or abuse protection on auth and expensive endpoints.
-- Unbounded queries (ties to the Scale standard) that enable resource exhaustion.
+- Unbounded queries (see `genesis:standards-performance`) that enable resource
+  exhaustion.
 
 **Dependencies**
 - Known-vulnerable packages. If the stack has an audit tool (e.g. `npm audit`,
@@ -90,6 +110,8 @@ Write to `specs/security/<scope-or-date>.md`. Start with a one-line scope + the
 - **Location**: file + line, and which entry point
 - **Impact**: what an attacker gains
 - **Fix direction**: the correct remedy (not code yet)
+- **Failing test**: the exact request or input and the expected rejection, so
+  `/genesis:fix` can reproduce it first
 - **Next step**: `/genesis:fix <specific vuln>` for a discrete fix, or
   `/genesis:audit-feature` → `/genesis:improve-feature` if it needs a design change
   (e.g. the whole authz model is missing).

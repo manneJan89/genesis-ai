@@ -104,6 +104,26 @@ change again. If a characterization test keeps failing, check whether it was a
 Keep behavior that this change legitimately alters (update the test) versus a real
 regression (fix the code) — don't loop blindly on it.
 
+## Phase 6.5 — Security pass (when the change touches the trust boundary)
+Run this if the change touched any of: endpoints or route handlers, RPCs or
+callable functions, auth or permission code, security rules files, database
+queries built from input, input parsing or deserialization, file uploads or
+paths, or anything named in the spec's Security section. Size doesn't matter:
+the most dangerous edit is often one line that drops a check. Skip it, and say
+so, only when the change touched none of these.
+
+1. Delegate to the **security-reviewer** subagent with the spec path, the
+   changed files, and the entry points added or altered. It reads, it doesn't
+   edit.
+2. For each finding scored 70 or above: the **test-writer** turns its "failing
+   test that would prove it" into a real test, you confirm it fails, then the
+   **bug-fixer** fixes it and the full suite runs.
+3. **Cap at 2 rounds.** Anything critical or high still open after that blocks
+   `done`: stop and report it, don't ship around it. Medium and low go to
+   `FINDINGS.md` with the reviewer's details.
+4. Its "outside this change" list goes to `FINDINGS.md` (critical or high there:
+   log it and stop, per the core rule).
+
 ## Phase 7 — Performance
 Verify the spec's performance budget with a real measurement. For refactors aimed
 at performance, report before-vs-after numbers. If no budget, say so.
@@ -134,8 +154,9 @@ If the spec names no roadmap, skip this phase.
 
 ## Phase 9 — Summary
 Report: what changed, which characterization tests were kept vs updated (and why),
-new acceptance criteria now passing, full test results, performance numbers, and
-anything left open or descoped.
+new acceptance criteria now passing, full test results, the security pass result
+(or why it was skipped), performance numbers, any `(manual)` criteria for me to
+check by hand, and anything left open or descoped.
 
 If the work is finished, clear `HANDOFF.md` as described under Handoff. If it
 ended blocked, leave it, with **Next step** saying what unblocks it.

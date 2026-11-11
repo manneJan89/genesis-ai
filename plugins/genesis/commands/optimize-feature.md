@@ -82,6 +82,30 @@ If the budget isn't met and worthwhile hotspots remain, return to Phase 3 for th
 next one. Stop when the budget is met, or when remaining gains are too small to
 justify the added complexity (diminishing returns — say so explicitly).
 
+## Phase 6.5 — Security pass (when the change touches the trust boundary)
+Optimizations are a common way to lose a check: a cache key without the user or
+tenant in it, a query rewrite that drops an ownership filter, a fast path that
+skips validation. Treat any of those as touching the trust boundary.
+
+Run this if the change touched any of: endpoints or route handlers, RPCs or
+callable functions, auth or permission code, security rules files, database
+queries built from input, input parsing or deserialization, file uploads or
+paths, or anything named in the spec's Security section. Size doesn't matter:
+the most dangerous edit is often one line that drops a check. Skip it, and say
+so, only when the change touched none of these.
+
+1. Delegate to the **security-reviewer** subagent with the spec path, the
+   changed files, and the entry points added or altered. It reads, it doesn't
+   edit.
+2. For each finding scored 70 or above: the **test-writer** turns its "failing
+   test that would prove it" into a real test, you confirm it fails, then the
+   **bug-fixer** fixes it and the full suite runs.
+3. **Cap at 2 rounds.** Anything critical or high still open after that blocks
+   `done`: stop and report it, don't ship around it. Medium and low go to
+   `FINDINGS.md` with the reviewer's details.
+4. Its "outside this change" list goes to `FINDINGS.md` (critical or high there:
+   log it and stop, per the core rule).
+
 ## Phase 7 — Summary
 Report: baseline vs final numbers with spread and total % gain, each change that
 was kept (and its individual contribution), anything tried and reverted and why,

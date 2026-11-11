@@ -10,8 +10,13 @@ and confirm with me before writing files.
 ## 1. Detect: new or existing project
 Look for stack signals in the repo root (and one level down): `package.json`,
 `angular.json`, `pubspec.yaml`, `go.mod`, `Cargo.toml`, `pyproject.toml`,
-`requirements.txt`, `pom.xml`, `build.gradle`, `Gemfile`, `composer.json`, etc.,
-plus the presence of a `src/`, `lib/`, or `test/` tree.
+`requirements.txt`, `pom.xml`, `build.gradle`, `Gemfile`, `composer.json`,
+`firebase.json`, `firestore.rules`, C and C++ build files (`CMakeLists.txt`,
+`Makefile`, `meson.build`, `vcpkg.json`, `conanfile.txt` / `conanfile.py`,
+`*.sln` / `*.vcxproj`), Unreal (`*.uproject`, a `Source/` folder with
+`*.Build.cs`), Unity (`ProjectSettings/ProjectVersion.txt` with an `Assets/`
+folder; `*.asmdef` files), other .NET (`*.csproj`), etc., plus the presence of a
+`src/`, `lib/`, or `test/` tree.
 
 - **Existing project** (signals found): infer the stack, package manager, test
   runner, lint/format tool, and likely build/run commands from those files. Read
@@ -27,9 +32,32 @@ plus the presence of a `src/`, `lib/`, or `test/` tree.
 
 ## 2. Propose the per-project config
 Show me a filled-in **Commands** block (install, run, build, test-all,
-test-single, lint, format, benchmark) and a first-draft **Codebase map** based on
-what you found. State your confidence and flag anything you're unsure about.
-Let me correct it before you write anything.
+test-single, lint, format, benchmark, and for C, C++ and Unreal a sanitizer test
+run) and a first-draft **Codebase map** based on what you found. State your
+confidence and flag anything you're unsure about. Let me correct it before you
+write anything.
+
+**Profiles.** Classify the code into the profiles the security and performance
+standards use, each with the folders it covers, and show me the list:
+- `server`: APIs, backends, Cloud Functions, anything receiving requests from
+  clients you don't control;
+- `client`: Angular, React, Vue, Flutter, desktop UI; name the framework on
+  the line (`angular`, `react`, `flutter`), since its rules load from a
+  separate file;
+- `firebase`: clients reading Firestore, RTDB or Storage directly (security
+  rules are the server); usually alongside `client`, and `server` for Functions;
+- `unreal`: Unreal Engine projects (its own C++ rules; don't add `native`);
+- `unity`: Unity projects (C#);
+- `native`: C or C++ outside Unreal.
+A repo can have several (an Angular app with a Node API is `client: web/` and
+`server: api/`). These decide which rules load: an Angular folder never loads
+the game or C++ rules. Ask me about anything ambiguous, and whether a game is
+multiplayer (the multiplayer rules only matter if it is).
+
+**Game projects: what tests can and can't cover.** Logic kept in plain classes
+(damage maths, inventory, state machines, save/load) is unit-testable and goes
+through tests-first like anything else. "Does it feel right" isn't; those
+criteria get tagged `(manual)` in specs. Say this once so it's expected.
 
 Also set **Component libraries**. Detect whether the project already depends on a
 shared component library; if none is found, set it to **none** (the default) — do
@@ -43,7 +71,18 @@ acceptance gate, the fix loop, and the characterization safety net all depend on
 runner that actually works. Establish it now.
 
 Detect what exists: a test framework in the dependencies, a test directory, runner
-config, and whether any tests are actually present. Then handle the case:
+config, and whether any tests are actually present. Usual frameworks to look
+for or propose by stack: Jest, Vitest or Karma/Jasmine (JavaScript and
+TypeScript), `flutter test` / `dart test`, GoogleTest, Catch2 or doctest with
+CTest (C, C++), Unreal's Automation tests (run headless, e.g.
+`UnrealEditor-Cmd <project>.uproject -ExecCmds="Automation RunTests <filter>;Quit"
+-unattended -nullrhi`), the Unity Test Framework in EditMode and PlayMode (run
+headless with `Unity -batchmode -runTests -testPlatform EditMode -projectPath .
+-testResults <file>`), and the Firebase emulator with
+`@firebase/rules-unit-testing` for security rules. For C and C++, also propose a
+sanitizer build of the tests (`-fsanitize=address,undefined`, or MSVC
+`/fsanitize=address`) and record it as the sanitizer test command. Then handle
+the case:
 
 **(a) No test infrastructure at all**
 Tell me plainly that this is a prerequisite, not a nice-to-have, and that without

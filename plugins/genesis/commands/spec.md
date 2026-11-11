@@ -1,7 +1,7 @@
 ---
 description: Interview me about a feature, then write an approved spec file
 argument-hint: [feature-name or short description]
-allowed-tools: Read, Write, Grep, Glob
+allowed-tools: Read, Write, Grep, Glob, Skill
 ---
 
 You are running the **planning + spec** phase for: $ARGUMENTS
@@ -45,12 +45,19 @@ several specs, or the interview keeps expanding in scope), stop and recommend
    - What is explicitly out of scope?
    - What are the concrete acceptance criteria (including edge and error cases)?
    - Are there performance targets?
-   - **Security (any feature touching data, endpoints, or user input):** Is this
-     public or authenticated? Who is authorized — which roles/owners, and is it
-     per-resource (can user A act on user B's record)? What input crosses a trust
-     boundary, and what's the server-side validation for it? Any secrets/config
-     involved (must come from env, never hardcoded)? Default to requiring auth
-     unless I say it's genuinely public.
+   - **Security (any feature with an entry point: endpoint, RPC, security
+     rules, parser, user input):** Is this public or authenticated? Who is
+     authorized — which roles/owners, and is it per-resource (can user A act on
+     user B's record)? What exactly does each entry point accept (fields, types,
+     ranges), and which fields must the client never set? What would a hostile
+     caller try? Any secrets/config involved (must come from env, never
+     hardcoded)? Default to requiring auth unless I say it's genuinely public.
+     Propose the answers yourself from the code and the profile rules
+     (`genesis:standards-security`), and ask me only to confirm or correct:
+     security is designed in this spec, not added later.
+   - **Criteria only a person can judge** (game feel, visual polish): tag them
+     `(manual)`. Keep them few; anything measurable (frame time, a value, a
+     state) is a normal criterion.
    - **Scale:** expected volume for any list/query here — does it need pagination,
      and are the filtered/sorted fields indexed?
    - What existing code/constraints must this respect or avoid touching?

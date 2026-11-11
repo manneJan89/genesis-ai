@@ -11,9 +11,16 @@ blueprints**. Don't fumble for a back door; read the code and find the real hole
 the one route missing an auth check, the business-logic flaw, the race condition,
 the data that's exposed if a layer fails. That's the advantage — use it.
 
-Load `genesis:standards-security` first. It is the floor, not the ceiling: every
-violation of it is a finding, but your job is to go past the checklist to the
-chains and logic flaws a checklist misses.
+Load `genesis:standards-security` first (it loads the profile files listed in
+CLAUDE.md → Profiles). It is the floor, not the ceiling: every violation of it is
+a finding, but your job is to go past the checklist to the chains and logic flaws
+a checklist misses.
+
+**What this is for.** Security is built in when a feature is specced and built,
+and checked per change by the build's security pass. Hack is the adversarial
+test of that implementation: it hunts for the holes that got through anyway, and
+proves each one with a test so the fix is verifiable and the hole can't quietly
+come back.
 
 ## Rules (read first — these are hard)
 - **Analyze and DESCRIBE exploits; never fire live ones.** Aggression is in the
@@ -24,8 +31,10 @@ chains and logic flaws a checklist misses.
 - **Only your own code.** Scope is THIS codebase and infrastructure the user owns,
   read locally. Never probe live external services, third-party APIs, or anything
   not owned — even ones this app calls. White-box means you don't need to.
-- **Read-only.** No edits, no fixes here — you find and report; fixing is the
-  user's call via `/genesis:fix` or a spec.
+- **Read-only.** No edits, no fixes here. You find each hole and write the exact
+  test that proves it; `/genesis:fix` then writes that test into the project,
+  runs it against local code to confirm it fails, and fixes it. Tests only ever
+  run against local code, mocks or an emulator, never a live system.
 - **Use the strongest model.** Finding non-obvious attack chains is exactly where a
   top model earns its cost — tell the user to run this on Opus (via Plan Mode) if
   they aren't; a weaker model will miss chains.
@@ -55,6 +64,19 @@ takes a class and reports independently so no single tunnel-vision):
 5. **Data exposure & secrets at rest** — the blast-radius lens: what's stored
    unencrypted, logged, over-returned, or recoverable that shouldn't be.
 
+Add the passes that match the project's profiles, and skip passes that don't
+apply (a single-player Unity game has no IDOR pass; say so in the report):
+- **unreal / unity (multiplayer):** client-authoritative values (damage,
+  currency, position), Server RPCs that trust their arguments, replicated state
+  the client can write, save-file and mod tampering, purchase validation done
+  only on the device.
+- **native / unreal (C++):** memory corruption reachable from input: lengths and
+  counts from files or packets, integer overflow in size maths, unchecked
+  indexes, use-after-free across object lifetimes.
+- **firebase:** rules that allow more than the app needs: `request.auth != null`
+  as the whole rule, client-writable ownership or role fields, collections with
+  no rules.
+
 ## Report — the format is the point
 First merge the passes' results and load the `genesis:finding-confidence` skill:
 dedupe, run the disprove pass on each chain (is there a guard somewhere along it
@@ -64,8 +86,11 @@ chains at 40–69 go in marked *unverified*; the rest follow the skill's thresho
 Write to `specs/security/hack-<date>.md`, findings ranked critical→low. **Every
 finding MUST have all five:**
 - **What** — the vulnerability, and the attack chain if it's a chain.
-- **Replicate** — exact steps to reproduce it (to run in a safe env), with the
-  file:line evidence that proves it exists in the code.
+- **Replicate** — written as **the failing test**: the exact request, call or
+  input, and the assertion it should meet (e.g. "POST /api/login with body
+  `{"email":"a@b.c","password":{"$ne":""}}` → expect 400; today it returns
+  200"), in the project's test framework where you can, plus the file:line
+  evidence that proves the hole exists.
 - **Fix** — the concrete remedy.
 - **Severity** — critical / high / medium / low, and the impact (what the attacker
   gains).
@@ -79,8 +104,11 @@ the exploit list; they're advice, still valuable.
 
 Append a one-line summary of each finding to `FINDINGS.md` (so the backlog stays the
 single triage view) pointing at the full report. Then show me the ranked list and
-ask which to act on — route each to `/genesis:fix` or `/genesis:spec`. Fix nothing
-yourself.
+ask which to act on. Each one I pick goes to `/genesis:fix` with its failing test
+(fix's reproduce-first gate runs it locally, sees it fail, then fixes it), or to
+`/genesis:spec` when the fix is a design change (for example, there's no
+authorization model at all). Recommend fixing critical and high first, in order.
+Fix nothing yourself.
 
 ## Honest limits (state these in the report)
 This is white-box adversarial *analysis*, not a live penetration test — no dynamic

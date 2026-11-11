@@ -26,16 +26,24 @@ token-hygiene guidance above the per-project block. Diff them:
 - rules **changed** in the template → candidates to update
 - rules I appear to have **customized** locally → flag, don't overwrite
 
-Do NOT touch my **PER-PROJECT block** (Project, Commands, Component libraries,
-Conventions, Codebase map, Logging destinations, Test baseline, Data safety) —
+Do NOT touch my **PER-PROJECT block** (Project, Commands, Profiles, Component
+libraries, Conventions, Codebase map, Logging destinations, Test baseline, Data
+safety) —
 those are mine and project-specific. Sync only the shared rule sections.
 
 **Exception — a per-project section that doesn't exist yet.** If the template
 has a per-project section my CLAUDE.md lacks entirely (e.g. **Data safety**,
-added in v0.22.0), add it, then fill it by running that section's step from
-`/genesis:setup` (for Data safety: ask me, read config structure only, never
-connect to a database or print a secret value). Never overwrite a section that
-already exists.
+added in v0.22.0, or **Profiles**, added in v0.26.0), add it, then fill it by
+running that section's step from `/genesis:setup` (for Data safety: ask me,
+read config structure only, never connect to a database or print a secret
+value; for Profiles: classify the code as setup step 2 does and show me the
+list). Never overwrite a section that already exists. The same goes for a new
+line in an existing per-project section (e.g. the **Sanitizer test run**
+command): add the line, fill it if it applies, and leave the rest alone.
+
+**Profiles matter most.** Without a Profiles section the security and
+performance skills have to guess which rules apply, so on a pre-0.26 project,
+still offer the Profiles step if I decline everything else, and say why.
 
 **Permission guardrails.** Compare the project's `.claude/settings.json` and
 `.claude/settings.local.json` against
