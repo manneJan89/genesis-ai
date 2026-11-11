@@ -11,6 +11,22 @@ load the Genesis standards skills that apply to the code you'll touch.
 The rule that governs this whole flow: **do not fix anything you have not first
 reproduced with a failing test.** A fix without a reproduction is a guess.
 
+## Handoff (keep it current as you go)
+This run keeps `HANDOFF.md` current so a later session can carry on if this one
+ends. Format: `${CLAUDE_PLUGIN_ROOT}/templates/HANDOFF.template.md`.
+- **At the start:** if a `HANDOFF.md` exists for different work, tell me before
+  replacing it.
+- **At the end of every phase:** overwrite it with where this run stands (phase
+  reached, done, half-done, the exact next step, open questions, decisions not yet
+  in the spec). Take **Branch** and **HEAD** from git. Keep it short. Don't commit it.
+- **Whenever the run stops early** (waiting for my approval, a gate or stop rule,
+  the fix-loop cap, blocked on an asset, or me telling you to stop): write it
+  before you stop. That is when it matters most. Make **Next step** say what
+  unblocks the work.
+- **When the work is done:** move anything in its decisions or open questions
+  that isn't recorded permanently into the spec, the roadmap or `FINDINGS.md`,
+  then delete `HANDOFF.md`.
+
 ## Phase 0 — Capture the report
 From what I've told you, fill in what you can and ask me **only** for what's
 genuinely missing (one question at a time, max three):
@@ -50,6 +66,15 @@ Delegate to the **bug-fixer** subagent with the failing test and your hypothesis
 The fix must be **minimal** and address the root cause, not mask the symptom. No
 refactoring beyond what the fix requires; no scope creep.
 
+**Data operations:** if the fix needs anything that writes to data outside a
+local or emulator database (migration, backfill, bulk update or delete, data-fix
+script, import), stop at the code fix and apply the **data-operation gate** from
+`genesis:standards-security`: you build and test it locally, I run it against
+real data after confirming a backup.
+
+Repairing already-corrupted production data is itself a data operation: write the
+repair script, test it locally, and hand it over under the same gate.
+
 **Cap at 3 attempts.** If the reproducing test isn't green after three fix
 attempts, stop and report the failed hypotheses and what you've ruled out rather
 than trying more variations. A bug that resists three targeted fixes usually needs
@@ -72,6 +97,9 @@ the shared logic — propose it, don't do it unilaterally).
 Report: the root cause in one or two sentences, exactly what changed, the test
 that now guards it, full suite results, and any related issues found in Phase 5.
 Note anything you deliberately left alone.
+
+If the work is finished, clear `HANDOFF.md` as described under Handoff. If it
+ended blocked, leave it, with **Next step** saying what unblocks it.
 
 ## When to escalate instead
 If the real fix requires a design change, touches many modules, or means changing

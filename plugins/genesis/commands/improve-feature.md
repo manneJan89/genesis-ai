@@ -12,6 +12,22 @@ the spec whenever you delegate, and pass the relevant details in the delegation
 prompt — subagents start fresh and only see what you give them. Delegate to
 subagents **by name explicitly**.
 
+## Handoff (keep it current as you go)
+This run keeps `HANDOFF.md` current so a later session can carry on if this one
+ends. Format: `${CLAUDE_PLUGIN_ROOT}/templates/HANDOFF.template.md`.
+- **At the start:** if a `HANDOFF.md` exists for different work, tell me before
+  replacing it.
+- **At the end of every phase:** overwrite it with where this run stands (phase
+  reached, done, half-done, the exact next step, open questions, decisions not yet
+  in the spec). Take **Branch** and **HEAD** from git. Keep it short. Don't commit it.
+- **Whenever the run stops early** (waiting for my approval, a gate or stop rule,
+  the fix-loop cap, blocked on an asset, or me telling you to stop): write it
+  before you stop. That is when it matters most. Make **Next step** say what
+  unblocks the work.
+- **When the work is done:** move anything in its decisions or open questions
+  that isn't recorded permanently into the spec, the roadmap or `FINDINGS.md`,
+  then delete `HANDOFF.md`.
+
 ## Phase 1 — Safety net (before touching anything)
 Delegate to the **characterization-tester** subagent to lock in every behavior
 tagged **Keep** in the spec. Confirm the whole net is green against the current,
@@ -25,6 +41,12 @@ target acceptance criteria, and — for a refactor — your assurance that the
 characterization tests stay green throughout. Everything not on that list stays
 untouched. Stop for my approval of the touch budget before writing. Prefer small
 reviewable chunks over one big pass.
+
+**Data operations:** if the plan includes anything that writes to data outside a
+local or emulator database (migration, backfill, bulk update or delete, data-fix
+script, import), name it in the plan and apply the **data-operation gate** from
+`genesis:standards-security`: you build and test it locally, I run it against
+real data after confirming a backup.
 
 ## Phase 3 — Target tests first (red)
 Skip for a pure **refactor** (no new behavior — the characterization net is the
@@ -109,3 +131,6 @@ If the spec names no roadmap, skip this phase.
 Report: what changed, which characterization tests were kept vs updated (and why),
 new acceptance criteria now passing, full test results, performance numbers, and
 anything left open or descoped.
+
+If the work is finished, clear `HANDOFF.md` as described under Handoff. If it
+ended blocked, leave it, with **Next step** saying what unblocks it.

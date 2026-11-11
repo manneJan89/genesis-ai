@@ -17,6 +17,22 @@ affordance, accessibility, the de-AI tells) is the bar the new design must meet.
 the handed design violates a UX principle, say so and propose the fix rather than
 faithfully reproducing a weak design.
 
+## Handoff (keep it current as you go)
+This run keeps `HANDOFF.md` current so a later session can carry on if this one
+ends. Format: `${CLAUDE_PLUGIN_ROOT}/templates/HANDOFF.template.md`.
+- **At the start:** if a `HANDOFF.md` exists for different work, tell me before
+  replacing it.
+- **At the end of every phase:** overwrite it with where this run stands (phase
+  reached, done, half-done, the exact next step, open questions, decisions not yet
+  in the spec). Take **Branch** and **HEAD** from git. Keep it short. Don't commit it.
+- **Whenever the run stops early** (waiting for my approval, a gate or stop rule,
+  the fix-loop cap, blocked on an asset, or me telling you to stop): write it
+  before you stop. That is when it matters most. Make **Next step** say what
+  unblocks the work.
+- **When the work is done:** move anything in its decisions or open questions
+  that isn't recorded permanently into the spec, the roadmap or `FINDINGS.md`,
+  then delete `HANDOFF.md`.
+
 ## Phase 0 — Scope gate (one unit per run)
 Resolve what's being redesigned to a single unit:
 - **One screen/page** → proceed.
@@ -87,3 +103,6 @@ behavior goes through `/genesis:spec`. Tell me what you logged.
 - If a spec/roadmap slice tracks this, update its status.
 - Summarize: states restyled, behavior net still green, consumers checked (if a
   shared component), new features logged for separate speccing, anything left open.
+
+If the work is finished, clear `HANDOFF.md` as described under Handoff. If it
+ended blocked, leave it, with **Next step** saying what unblocks it.

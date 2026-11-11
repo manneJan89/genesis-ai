@@ -28,3 +28,9 @@ optional. Project-specific additions live in the project's CLAUDE.md under
     overrides the urge to "log everything to debug it"). Log an id, not the record.
   - Internal detail (stack traces) goes to the log sink, **never to a client
     response** (ties to the security standard).
+  - **Redact at the seam.** The logger abstraction masks anything
+    credential-shaped (connection strings containing a password, keys, tokens,
+    auth headers) before writing, as a backstop for the day someone logs a whole
+    config or error object. Never log a config object, environment, connection
+    options, or request headers wholesale; pick the fields you need. A credential
+    that has appeared in a log is leaked: tell me so it gets rotated.

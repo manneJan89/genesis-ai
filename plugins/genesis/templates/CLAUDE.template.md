@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.21.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.24.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -27,6 +27,8 @@ not share a conversation.
 - Make it faster: `/genesis:audit-feature <thing>` (type=refactor) →
   `/genesis:optimize-feature specs/<name>.md`
 - Fix a reported bug: `/genesis:fix <bug>`
+- Stopping mid-task, or picking up a previous session's work: `/genesis:handoff`
+  (or `/genesis:handoff resume`).
 - Find problems: `/genesis:review`, `/genesis:security-check`, `/genesis:hack`
 
 Don't write implementation code for a feature until an approved spec exists in `specs/`.
@@ -73,7 +75,7 @@ ones that apply:**
 | Work involves | Load skill |
 |---|---|
 | Writing, refactoring, or reviewing any code | `genesis:standards-code` |
-| Endpoints, auth/permissions, user input, secrets, queries | `genesis:standards-security` |
+| Endpoints, auth/permissions, user input, secrets, queries, migrations or data scripts | `genesis:standards-security` |
 | Queries, lists, collections, caching, metered services (Firebase, Supabase, paid APIs) | `genesis:standards-performance` |
 | Screens, components, forms, icons/assets | `genesis:standards-ui` + `genesis:ux` |
 | Error handling or logging | `genesis:standards-logging` |
@@ -114,6 +116,29 @@ stop and load the skill.
 - **No secrets in source, ever.** Keys, tokens, and credentials come from
   environment/config, never code, logs, or commits. If you find one hardcoded or
   committed, stop and tell me immediately — it needs rotating, not a backlog entry.
+  Don't open env or secrets files to read their values: code needs the variable
+  name, never the value.
+
+- **Never use credentials you weren't given.** Use only the credentials this
+  project's config provides for the task. One you come across anywhere else (a
+  log, output, file, message) is a leak, not a key: don't use it, even if it would
+  help. Stop, tell me where it is, and end the task so it gets rotated.
+
+- **Live data: never act on it destructively.** Never run anything that deletes,
+  overwrites, drops, migrates, or bulk-modifies data outside a local or emulator
+  database: not as a test, not with an unverified dry-run flag, not to check that
+  a guard refuses. Test guards with unit tests against mocks. "Check the script"
+  means read it, never run it. Real-data operations go through the data-operation
+  gate (`genesis:standards-security`): you prepare them, I run them. Likewise
+  never force-push, delete branches, rewrite history, or discard uncommitted work
+  without my explicit go-ahead.
+
+- **"Stop" means the task ends.** When a rule says stop, or you find a critical
+  or high-severity security problem, end the task and tell me. Mentioning it and
+  carrying on is not stopping. Don't resume until I say so. The same goes for a
+  denied or unapproved command: it's a decision, not an obstacle. Never route
+  around it by rephrasing it, wrapping it (`bash -c`, a full program path, a new
+  script), or reaching the same result another way. Tell me what you needed and why.
 
 - **Modifying existing code: change only what was asked.** When editing a file
   that already exists, add and modify exactly what the spec names — and leave
@@ -133,9 +158,19 @@ stop and load the skill.
   **Append it to `FINDINGS.md`** at the repo root (create it if missing) with
   severity, location, what it is, and a suggested next step, then continue your
   actual task. The backlog is worked separately via `/genesis:findings`.
-  **Exception — a committed/hardcoded secret is live exposure, not a note for
-  later:** log it AND stop to tell me immediately, because it needs rotating and
-  purging from history, which can't wait for a backlog review.
+  **Exception — a leaked secret or a critical/high security problem is not a note
+  for later:** log it AND stop (the task ends, per "Stop means the task ends"),
+  because it needs rotating and purging, which can't wait for a backlog review.
+
+- **Session handoff: read it first, trust it second.** If `HANDOFF.md` exists at
+  the repo root, read it before anything else, then check it against git before
+  acting on it: is its **Branch** the current branch, what was committed since its
+  **HEAD when written**, what's uncommitted, and is its **Next step** already done?
+  If the note and the repo disagree, the repo wins: tell me what differs. A
+  handoff from another branch isn't yours; say so and leave it. Approvals don't
+  carry over between sessions: a step that needed my go-ahead still needs it. The
+  build commands keep the file current at phase boundaries and delete it when the
+  work is done; if you stop mid-task outside a command, offer `/genesis:handoff`.
 
 - **No emojis. Anywhere.** Not in UI, not in user-facing copy ("Thanks for
   registering 🎉" is banned), not in comments, logs, or commit messages. For
@@ -186,6 +221,24 @@ abstraction below — never `print`/`console.log`/direct SDK calls.
 > Genesis does not provision monitoring services. To add one (Sentry, Crashlytics),
 > build it as a feature — `/genesis:spec add <service> error reporting` — so the
 > DSN-from-env, cost note, and init go through the normal approval gates.
+
+## Data safety
+What this project's data is, where it lives, and how it comes back if it's lost.
+Filled by `/genesis:setup`; keep it current. Agents read it before any data work.
+
+- **Databases**: <e.g. "Firestore (prod: project-x), Postgres (staging)">
+- **Dev sessions point at**: <emulator / local DB / staging / read-only creds>
+- **Production reachable from this machine?**: <no (target) | YES — see warning>
+  > If YES, the agent can reach production. Fix it: move production credentials
+  > off this machine and point dev at an emulator, local DB, or staging.
+- **Where production credentials live**: <secret manager / CI only / …>
+- **Backups**: <method, frequency, retention; stored separately from the
+  credentials agents can reach?>
+- **Last restore test**: <date, or "never" — an untested backup is a hope>
+- **Repo protection**: <branch protection on main: no force-push, no deletion;
+  any mirror>
+- **Permission guardrails**: <installed in .claude/settings.json (Genesis vX) |
+  declined> — deny/ask rules Claude Code enforces itself; see `/permissions`
 
 ## Component libraries
 Which shared UI/component library this project uses. **Default: none.**

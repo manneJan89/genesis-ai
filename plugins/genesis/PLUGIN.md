@@ -55,6 +55,7 @@ Start from what you're trying to do:
 | Audit security across the app | `/genesis:security-check [scope]` | Attacker's-eye, checklist-driven vulnerability report routed to `/genesis:fix` |
 | Fix a reported bug | `/genesis:fix <what's broken>` | A failing test that reproduces it, a minimal fix, and that test left behind as a regression guard |
 | Make working code faster | `/genesis:audit-feature <thing>` (Change type = `refactor`) → `/genesis:optimize-feature specs/<name>.md` | Measured before/after numbers, behavior provably unchanged |
+| Stop mid-task, or carry on from a previous session | `/genesis:handoff` (or `resume`) | `HANDOFF.md`: task, phase, the exact next step, checked against git by the next session |
 
 Rules of thumb:
 - **Every code change starts with a spec.** New code → `spec`. Existing code → `audit-feature`.
@@ -113,6 +114,15 @@ Rules of thumb:
   shared component while keeping behavior. Render-surface audit (not behavioral),
   new design written to `design/` and approved before code, behavior netted, new
   features found are logged not built. Multi-screen redesign → use a roadmap.
+- `/genesis:handoff [resume|clear]` — writes `HANDOFF.md`, a one-page note of what
+  this session was busy with, how far it got, and the exact next step, so the next
+  session carries on instead of rediscovering. The build commands (build-feature,
+  improve-feature, redesign, optimize-feature, fix) write it at every phase
+  boundary and when they stop early, and delete it when the work is done. Every
+  session reads it first and checks it against git (branch, commits since, what's
+  uncommitted); where they disagree, the repo wins. Approvals never carry over.
+  It's committed with your work (not by Genesis), so commit and push to pick up on
+  another machine. Never holds secrets or production data.
 - `/genesis:improve-feature specs/<name>.md` — characterization net first → plan (you
   approve) → target tests first (red) → change (green) → acceptance → fix loop → perf → summary.
 - `/genesis:optimize-feature specs/<name>.md` — baseline + profile → safety net →
@@ -154,6 +164,31 @@ writing (a spec is a few KB). If your bill runs high:
 - **Smaller slices win**: a big feature that needs several fix cycles re-emits far
   more than small slices that pass first try. Lean on roadmap slicing.
 - `/clear` between unrelated features so you're not re-processing stale context.
+
+## Safety: what's enforced and what's only instructed
+Genesis's rules in CLAUDE.md are instructions. A model can reason its way past an
+instruction, so the protections are layered, strongest first:
+
+1. **No production credentials on the dev machine** (your infrastructure; setup's
+   Data safety step checks and warns). The only layer that can't be bypassed.
+2. **Branch protection on GitHub** for `main` (you set it; setup checks).
+3. **Permission guardrails** (`templates/permissions.template.json`, offered by
+   `/genesis:setup` and `/genesis:sync`). Enforced by Claude Code itself in every
+   mode. Tested against Claude Code 2.1.299:
+   - denied: force-push (incl. `--force-with-lease`, `-f`, env-prefixed and
+     compound forms), `push --delete`, `reset --hard`, `clean -f`, `branch -D`,
+     and reading `.env`/`.env.local`/`.env.production` or key files, by Claude's
+     file tools *and* by `cat`, `grep`, `sed`, `head`;
+   - prompts (even in auto mode): any command with `--delete`/`--drop`/
+     `--purge`/`--wipe`/`--truncate`, `branch -d`, `source .env`, `bash -c` /
+     `sh -c`, database command-line tools, migrations, `firebase deploy`;
+   - still allowed: `git clean -n`, `--dry-run`, `.env.example`.
+   - **Not covered:** `git push origin :branch` (the colon delete form can't be
+     expressed as a rule), a full program path for git (`/usr/bin/git …`), `git -c
+     … push`, and a script with a destructive action hard-coded inside and no
+     flag. Rule matching is case-sensitive.
+4. **Genesis's rules** (stop means stop, never use found credentials, never act
+   destructively on live data, never route around a denial).
 
 ## Skills
 - **ux** — design/UX reasoning (visual hierarchy, spacing & rhythm, the required UI
