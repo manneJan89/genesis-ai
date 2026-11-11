@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.24.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.25.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -188,7 +188,7 @@ stop and load the skill.
 
 ## Commands
 The canonical commands agents use. Fill in the ones that apply to this stack;
-delete the rest. (Examples in the README show a Node/Angular and a Flutter fill.)
+delete the rest.
 
 - Install deps:
 - Run / serve:

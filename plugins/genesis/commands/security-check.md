@@ -1,7 +1,7 @@
 ---
 description: Deliberate whole-surface security audit — attacker's-eye, checklist-driven, read-only
 argument-hint: [scope: whole app (default), a feature, or an area]
-allowed-tools: Read, Grep, Glob, Bash, Skill
+allowed-tools: Read, Grep, Glob, Skill, Bash(git status*), Bash(git diff*), Bash(git log*), Bash(git show*), Bash(npm audit*), Bash(pnpm audit*), Bash(yarn audit*), Bash(flutter pub outdated*), Bash(dart pub outdated*), Bash(pip-audit*)
 ---
 
 Run a security audit of: ${ARGUMENTS:-the whole application}

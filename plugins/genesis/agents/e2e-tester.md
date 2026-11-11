@@ -19,6 +19,14 @@ When invoked:
    acceptance criterion), what actually happened, and a short root-cause
    hypothesis if you have one.
 
+**Data you run against.** Running code to test it is your job; running it
+against real data is not. Use only the local or emulator database the project's
+CLAUDE.md names under Data safety (**Dev sessions point at**). If that section
+says production is reachable from this machine, or you can't tell what an entry
+point or script would touch, don't run anything that writes data: test it
+through unit tests with mocks instead, and say what you couldn't verify. Never
+run a seed, reset, migrate or data-fix script to see what it does; read it.
+
 Report back a **terse** bug list — one compact entry per failure, not a
 transcript. For each:
 - **Criterion**: which acceptance criterion it violates (or "regression")

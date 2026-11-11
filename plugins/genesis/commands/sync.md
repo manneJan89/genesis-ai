@@ -13,7 +13,12 @@ findings-capture rule, design gate, modification contract, logging, security,
 scale, etc. — don't reach an existing project until this sync runs.
 
 ## 1. Compare
-Read the project's `CLAUDE.md` and the current template at
+If `CLAUDE.md` imports `@CLAUDE.genesis.md`, the Genesis rules live in that file:
+compare and update it instead, and leave `CLAUDE.md` alone. If a
+`CLAUDE.genesis.md` exists but `CLAUDE.md` has no `@CLAUDE.genesis.md` line, the
+rules aren't loading at all; tell me, and offer to add the line.
+
+Read the project's `CLAUDE.md` (or `CLAUDE.genesis.md`) and the current template at
 `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.template.md`. Focus on the **rule
 sections** that ship in the template — Standards, and the workflow/testing/
 token-hygiene guidance above the per-project block. Diff them:
@@ -37,7 +42,9 @@ already exists.
 `${CLAUDE_PLUGIN_ROOT}/templates/permissions.template.json`. If the template has
 `deny` or `ask` rules the project lacks, list them in plain words and offer to add
 them, following the merge rules in setup's Permission guardrails step (merge,
-never replace; never add `allow` rules; say what they don't cover). If CLAUDE.md
+never replace; the only `allow` rules are the exact test and lint commands; say
+what they don't cover). If the project has no `allow` rule for its test command,
+offer it: since v0.25 Genesis commands no longer pre-approve shell commands. If CLAUDE.md
 → Data safety records that I declined the guardrails, mention the new rules once
 and don't push.
 

@@ -1,7 +1,7 @@
 ---
 description: Improve an existing feature from an approved audit spec, safely
 argument-hint: [path/to/spec.md]
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, Skill
+allowed-tools: Read, Write, Edit, Grep, Glob, Agent, Skill, Bash(rm HANDOFF.md)
 ---
 
 Orchestrate a safe improvement of an existing feature from the spec at: $ARGUMENTS
@@ -20,13 +20,16 @@ ends. Format: `${CLAUDE_PLUGIN_ROOT}/templates/HANDOFF.template.md`.
 - **At the end of every phase:** overwrite it with where this run stands (phase
   reached, done, half-done, the exact next step, open questions, decisions not yet
   in the spec). Take **Branch** and **HEAD** from git. Keep it short. Don't commit it.
+  Plan mode blocks file writes, so while it's on, skip the write and do it as
+  soon as I approve the plan.
 - **Whenever the run stops early** (waiting for my approval, a gate or stop rule,
   the fix-loop cap, blocked on an asset, or me telling you to stop): write it
   before you stop. That is when it matters most. Make **Next step** say what
   unblocks the work.
 - **When the work is done:** move anything in its decisions or open questions
   that isn't recorded permanently into the spec, the roadmap or `FINDINGS.md`,
-  then delete `HANDOFF.md`.
+  then delete it with exactly `rm HANDOFF.md` (the one deletion this command
+  pre-approves).
 
 ## Phase 1 — Safety net (before touching anything)
 Delegate to the **characterization-tester** subagent to lock in every behavior
@@ -94,14 +97,12 @@ whole feature. Repeat until everything is green — including the untouched
 characterization tests, which guard against regressions. Stop and report any
 blocker rather than working around the spec.
 
-**Cap the loop at 3 fix cycles.** If it's not green after three passes, stop and
+**Cap the loop at 3 fix cycles.** The cap holds even if a `/goal` or other
+loop is set: at three, stop and report. If it's not green after three passes, stop and
 report what's still failing and your best hypothesis rather than regenerating the
 change again. If a characterization test keeps failing, check whether it was a
 Keep behavior that this change legitimately alters (update the test) versus a real
 regression (fix the code) — don't loop blindly on it.
-
-> For a hands-off loop: `/goal the full suite passes, the Keep characterization
-> tests still pass, and the target acceptance criteria in <spec> are met`.
 
 ## Phase 7 — Performance
 Verify the spec's performance budget with a real measurement. For refactors aimed
@@ -116,9 +117,13 @@ at performance, report before-vs-after numbers. If no budget, say so.
 ## Phase 8 — Update the roadmap (if any)
 If the spec header names a roadmap (`Roadmap: specs/roadmaps/<name>.md (slice N …)`),
 open that roadmap and:
-- mark this slice `done`,
+- set this slice's status from the outcome, not the code: `done` only if Phase
+  7.5 passed; if the work ended **blocked-on-asset** (or blocked for any other
+  reason), set `blocked — <what's missing>` and leave **Next up** pointing at
+  this slice,
 - fill in its Spec column with a relative link to the spec,
-- move **Next up** to the first remaining non-done slice,
+- if (and only if) it's `done`, move **Next up** to the first remaining non-done
+  slice,
 - update Last updated.
 
 If a shared decision changed during this build (schema, enum, side-effect rule),

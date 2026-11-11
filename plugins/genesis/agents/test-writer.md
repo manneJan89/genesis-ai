@@ -20,6 +20,14 @@ When invoked, first load the Genesis standards skills that apply to the code
 you're working on (the table under Standards in CLAUDE.md lists them; the
 orchestrator may also name them).
 
+**Data you run against.** Running code to test it is your job; running it
+against real data is not. Use only the local or emulator database the project's
+CLAUDE.md names under Data safety (**Dev sessions point at**). If that section
+says production is reachable from this machine, or you can't tell what an entry
+point or script would touch, don't run anything that writes data: test it
+through unit tests with mocks instead, and say what you couldn't verify. Never
+run a seed, reset, migrate or data-fix script to see what it does; read it.
+
 1. Read the spec you're given, especially its acceptance criteria and edge/error
    cases. Learn the surface from the approved signatures (tests-first) or the
    code's public API (after-build). If the surface is missing something a

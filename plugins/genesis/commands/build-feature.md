@@ -1,7 +1,7 @@
 ---
 description: Build a feature from an approved spec, then test, fix, and verify it
 argument-hint: [path/to/spec.md]
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, Skill
+allowed-tools: Read, Write, Edit, Grep, Glob, Agent, Skill, Bash(rm HANDOFF.md)
 ---
 
 Orchestrate the full build pipeline for the spec at: $ARGUMENTS
@@ -23,13 +23,16 @@ ends. Format: `${CLAUDE_PLUGIN_ROOT}/templates/HANDOFF.template.md`.
 - **At the end of every phase:** overwrite it with where this run stands (phase
   reached, done, half-done, the exact next step, open questions, decisions not yet
   in the spec). Take **Branch** and **HEAD** from git. Keep it short. Don't commit it.
+  Plan mode blocks file writes, so while it's on, skip the write and do it as
+  soon as I approve the plan.
 - **Whenever the run stops early** (waiting for my approval, a gate or stop rule,
   the fix-loop cap, blocked on an asset, or me telling you to stop): write it
   before you stop. That is when it matters most. Make **Next step** say what
   unblocks the work.
 - **When the work is done:** move anything in its decisions or open questions
   that isn't recorded permanently into the spec, the roadmap or `FINDINGS.md`,
-  then delete `HANDOFF.md`.
+  then delete it with exactly `rm HANDOFF.md` (the one deletion this command
+  pre-approves).
 
 ## Phase 0 — Route silently (new vs build-upon-existing)
 `build-feature` is the single entry point: "I planned it, now build it" — whether
@@ -149,15 +152,12 @@ whole feature. Repeat until the suite is green against every acceptance criterio
 or until you hit a blocker you can't resolve — in which case stop and report it
 rather than hacking around the spec.
 
-**Cap the loop at 3 fix cycles.** If it's not green after three build→test→fix
+**Cap the loop at 3 fix cycles.** The cap holds even if a `/goal` or other
+loop is set: at three, stop and report. If it's not green after three build→test→fix
 passes, stop and report what's still failing, your best hypothesis, and what you'd
 try next — do not keep regenerating code. Repeated failure usually means the spec
 or the approach is wrong, not that another cycle will fix it, and each cycle
 re-emits the whole change. Getting my input is cheaper than a fourth blind pass.
-
-> Tip: for a hands-off version of this loop, I can instead run
-> `/goal all tests pass and the acceptance criteria in <spec> are met`
-> and let Claude iterate build → test → fix → re-test on its own.
 
 ## Phase 7 — Performance
 Check the spec's performance budget. If one exists, verify it with a concrete
@@ -180,9 +180,13 @@ numbers against the target. If no budget was specified, say so and move on.
 ## Phase 8 — Update the roadmap (if any)
 If the spec header names a roadmap (`Roadmap: specs/roadmaps/<name>.md (slice N …)`),
 open that roadmap and:
-- mark this slice `done`,
+- set this slice's status from the outcome, not the code: `done` only if Phase
+  7.5 passed; if the work ended **blocked-on-asset** (or blocked for any other
+  reason), set `blocked — <what's missing>` and leave **Next up** pointing at
+  this slice,
 - fill in its Spec column with a relative link to the spec,
-- move **Next up** to the first remaining non-done slice,
+- if (and only if) it's `done`, move **Next up** to the first remaining non-done
+  slice,
 - update Last updated.
 
 If a shared decision changed during this build (schema, enum, side-effect rule),

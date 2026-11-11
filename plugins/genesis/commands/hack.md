@@ -1,7 +1,7 @@
 ---
 description: White-box red-team of your OWN code — adversarial attack-chain + blast-radius analysis, logged with replication and fix
 argument-hint: [scope: whole app (default), a feature, or an area]
-allowed-tools: Read, Grep, Glob, Bash, Agent, Skill
+allowed-tools: Read, Grep, Glob, Agent, Skill, Bash(git status*), Bash(git diff*), Bash(git log*), Bash(git show*)
 ---
 
 Red-team the codebase: ${ARGUMENTS:-the whole application}

@@ -56,6 +56,8 @@ Start from what you're trying to do:
 | Fix a reported bug | `/genesis:fix <what's broken>` | A failing test that reproduces it, a minimal fix, and that test left behind as a regression guard |
 | Make working code faster | `/genesis:audit-feature <thing>` (Change type = `refactor`) → `/genesis:optimize-feature specs/<name>.md` | Measured before/after numbers, behavior provably unchanged |
 | Stop mid-task, or carry on from a previous session | `/genesis:handoff` (or `resume`) | `HANDOFF.md`: task, phase, the exact next step, checked against git by the next session |
+| Aggressively red-team your own code | `/genesis:hack [scope]` | White-box attack chains and blast radius, each with how to replicate and fix; never runs live attacks |
+| Pull new rules into a project after updating the plugin | `/genesis:sync` | Your `CLAUDE.md` brought up to date, per-project block untouched, diff shown first |
 
 Rules of thumb:
 - **Every code change starts with a spec.** New code → `spec`. Existing code → `audit-feature`.
@@ -187,8 +189,25 @@ instruction, so the protections are layered, strongest first:
      expressed as a rule), a full program path for git (`/usr/bin/git …`), `git -c
      … push`, and a script with a destructive action hard-coded inside and no
      flag. Rule matching is case-sensitive.
+   - Since v0.25 also prompted: recursive deletes (`rm -r`, `rm -rf`, `rm -vrf`,
+     `rm dir -rf`, `rm --recursive`), `find -delete`, and `xargs rm` (tested
+     against Claude Code 2.1.322; a plain single-file `rm` is not caught). The
+     PowerShell delete aliases (`rm`, `del`, `erase`, `rd`, `ri`, `rmdir`) are in
+     the rule set but untested, since no Windows machine was available.
+   - The only `allow` rules setup offers are your exact test and lint commands.
 4. **Genesis's rules** (stop means stop, never use found credentials, never act
    destructively on live data, never route around a denial).
+
+**What Genesis commands pre-approve.** A command's `allowed-tools` line doesn't
+restrict tools; it approves them without a prompt while the command runs.
+Before v0.25, most Genesis commands listed bare `Bash`, which silently approved
+*every* shell command not caught by a deny or ask rule (tested: `rm -rf` and
+`node <script>` ran with no prompt inside a Genesis command, and prompted
+outside it). Now no Genesis command pre-approves the shell except for read-only
+git (`status`, `diff`, `log`, `show`), dependency audits in `security-check`,
+and the single command `rm HANDOFF.md`. Everything else follows your own
+permission settings, so in default mode Claude asks. To stop the build loop
+prompting on every test run, allow your exact test command (setup offers this).
 
 ## Skills
 - **ux** — design/UX reasoning (visual hierarchy, spacing & rhythm, the required UI
@@ -224,14 +243,46 @@ so the same agents work on any stack. Under the plugin they're namespaced
 ```
 
 ## Updating
-After `/plugin marketplace update genesis`, run **`/genesis:sync`** in each
-existing project to pull new Standards/rules into its `CLAUDE.md` — the plugin
-update refreshes commands and agents but not a project's already-written CLAUDE.md.
+To release: bump `version` in `.claude-plugin/plugin.json` (and the
+`genesis-standards-version` marker in `templates/CLAUDE.template.md` if the
+template changed), then push.
 
-Bump `version` in `.claude-plugin/plugin.json`, push, and users run
-`/plugin marketplace update genesis`. That refreshes agents and commands — but not
-a CLAUDE.md already written into a project. Re-run `/genesis:setup` (or edit by
-hand) to pull template changes into an existing project's CLAUDE.md.
+To take an update: `/plugin marketplace update genesis`, `/reload-plugins`, then
+**`/genesis:sync`** in each existing project. The plugin update refreshes
+commands, agents and skills, but not a project's already-written `CLAUDE.md`;
+sync closes that gap and offers any new permission rules.
+
+## Independence: the workflow never requires a component kit
+
+The workflow plugin stands alone. Install `genesis` and nothing else, and it works
+fully — it generates plain Flutter / Angular / React code with no Genesis imports
+and no Genesis dependency in your `pubspec.yaml` or `package.json`.
+
+Even with a component kit installed, a project only uses it if that project's own
+`CLAUDE.md` opts in under **Component libraries**. The default written by
+`/genesis:setup` is `none`, which instructs Claude to build project-local
+components and not to suggest external component packages. Adding a dependency
+always requires your approval.
+
+So: use Genesis on a project with a bespoke design system, a client's existing
+component library, or nothing at all — the workflow doesn't care.
+
+## Your standards live here
+
+The rules every project inherits live in two places:
+
+- **`skills/standards-*/`** — the detailed Standards (code quality,
+  security, performance/cost/scale, UI, logging). They load only when the work
+  calls for them, so they don't cost context on every call. Edit a skill once and
+  every project gets it on the next `/plugin marketplace update genesis` — no
+  `/genesis:sync` needed.
+- **`templates/CLAUDE.template.md`** — the short always-on core
+  (honesty, no secrets, live-data safety, stop means stop, change only what was
+  asked, log out-of-scope findings, session handoff, no emojis) plus the table
+  telling Claude which standards skill to load when. Changes here reach existing
+  projects via `/genesis:sync`.
+
+Project-specific rules go in that project's own `CLAUDE.md` under Conventions.
 
 ## Plugin layout
 ```
