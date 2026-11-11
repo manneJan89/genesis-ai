@@ -1,7 +1,7 @@
 ---
 description: Improve an existing feature from an approved audit spec, safely
 argument-hint: [path/to/spec.md]
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, Skill
+allowed-tools: Read, Write, Edit, Grep, Glob, Agent, Skill, Bash(rm HANDOFF.md)
 ---
 
 Orchestrate a safe improvement of an existing feature from the spec at: $ARGUMENTS
@@ -20,13 +20,16 @@ ends. Format: `${CLAUDE_PLUGIN_ROOT}/templates/HANDOFF.template.md`.
 - **At the end of every phase:** overwrite it with where this run stands (phase
   reached, done, half-done, the exact next step, open questions, decisions not yet
   in the spec). Take **Branch** and **HEAD** from git. Keep it short. Don't commit it.
+  Plan mode blocks file writes, so while it's on, skip the write and do it as
+  soon as I approve the plan.
 - **Whenever the run stops early** (waiting for my approval, a gate or stop rule,
   the fix-loop cap, blocked on an asset, or me telling you to stop): write it
   before you stop. That is when it matters most. Make **Next step** say what
   unblocks the work.
 - **When the work is done:** move anything in its decisions or open questions
   that isn't recorded permanently into the spec, the roadmap or `FINDINGS.md`,
-  then delete `HANDOFF.md`.
+  then delete it with exactly `rm HANDOFF.md` (the one deletion this command
+  pre-approves).
 
 ## Phase 1 — Safety net (before touching anything)
 Delegate to the **characterization-tester** subagent to lock in every behavior
@@ -94,14 +97,32 @@ whole feature. Repeat until everything is green — including the untouched
 characterization tests, which guard against regressions. Stop and report any
 blocker rather than working around the spec.
 
-**Cap the loop at 3 fix cycles.** If it's not green after three passes, stop and
+**Cap the loop at 3 fix cycles.** The cap holds even if a `/goal` or other
+loop is set: at three, stop and report. If it's not green after three passes, stop and
 report what's still failing and your best hypothesis rather than regenerating the
 change again. If a characterization test keeps failing, check whether it was a
 Keep behavior that this change legitimately alters (update the test) versus a real
 regression (fix the code) — don't loop blindly on it.
 
-> For a hands-off loop: `/goal the full suite passes, the Keep characterization
-> tests still pass, and the target acceptance criteria in <spec> are met`.
+## Phase 6.5 — Security pass (when the change touches the trust boundary)
+Run this if the change touched any of: endpoints or route handlers, RPCs or
+callable functions, auth or permission code, security rules files, database
+queries built from input, input parsing or deserialization, file uploads or
+paths, or anything named in the spec's Security section. Size doesn't matter:
+the most dangerous edit is often one line that drops a check. Skip it, and say
+so, only when the change touched none of these.
+
+1. Delegate to the **security-reviewer** subagent with the spec path, the
+   changed files, and the entry points added or altered. It reads, it doesn't
+   edit.
+2. For each finding scored 70 or above: the **test-writer** turns its "failing
+   test that would prove it" into a real test, you confirm it fails, then the
+   **bug-fixer** fixes it and the full suite runs.
+3. **Cap at 2 rounds.** Anything critical or high still open after that blocks
+   `done`: stop and report it, don't ship around it. Medium and low go to
+   `FINDINGS.md` with the reviewer's details.
+4. Its "outside this change" list goes to `FINDINGS.md` (critical or high there:
+   log it and stop, per the core rule).
 
 ## Phase 7 — Performance
 Verify the spec's performance budget with a real measurement. For refactors aimed
@@ -116,9 +137,13 @@ at performance, report before-vs-after numbers. If no budget, say so.
 ## Phase 8 — Update the roadmap (if any)
 If the spec header names a roadmap (`Roadmap: specs/roadmaps/<name>.md (slice N …)`),
 open that roadmap and:
-- mark this slice `done`,
+- set this slice's status from the outcome, not the code: `done` only if Phase
+  7.5 passed; if the work ended **blocked-on-asset** (or blocked for any other
+  reason), set `blocked — <what's missing>` and leave **Next up** pointing at
+  this slice,
 - fill in its Spec column with a relative link to the spec,
-- move **Next up** to the first remaining non-done slice,
+- if (and only if) it's `done`, move **Next up** to the first remaining non-done
+  slice,
 - update Last updated.
 
 If a shared decision changed during this build (schema, enum, side-effect rule),
@@ -129,8 +154,9 @@ If the spec names no roadmap, skip this phase.
 
 ## Phase 9 — Summary
 Report: what changed, which characterization tests were kept vs updated (and why),
-new acceptance criteria now passing, full test results, performance numbers, and
-anything left open or descoped.
+new acceptance criteria now passing, full test results, the security pass result
+(or why it was skipped), performance numbers, any `(manual)` criteria for me to
+check by hand, and anything left open or descoped.
 
 If the work is finished, clear `HANDOFF.md` as described under Handoff. If it
 ended blocked, leave it, with **Next step** saying what unblocks it.

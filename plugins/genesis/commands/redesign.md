@@ -1,7 +1,7 @@
 ---
 description: Redesign one screen or shared component's look — keep behavior, replace the visuals
 argument-hint: [screen or component] — attach/point to the new design
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, Skill
+allowed-tools: Read, Write, Edit, Grep, Glob, Agent, Skill, Bash(rm HANDOFF.md)
 ---
 
 Redesign the look of: $ARGUMENTS
@@ -25,13 +25,16 @@ ends. Format: `${CLAUDE_PLUGIN_ROOT}/templates/HANDOFF.template.md`.
 - **At the end of every phase:** overwrite it with where this run stands (phase
   reached, done, half-done, the exact next step, open questions, decisions not yet
   in the spec). Take **Branch** and **HEAD** from git. Keep it short. Don't commit it.
+  Plan mode blocks file writes, so while it's on, skip the write and do it as
+  soon as I approve the plan.
 - **Whenever the run stops early** (waiting for my approval, a gate or stop rule,
   the fix-loop cap, blocked on an asset, or me telling you to stop): write it
   before you stop. That is when it matters most. Make **Next step** say what
   unblocks the work.
 - **When the work is done:** move anything in its decisions or open questions
   that isn't recorded permanently into the spec, the roadmap or `FINDINGS.md`,
-  then delete `HANDOFF.md`.
+  then delete it with exactly `rm HANDOFF.md` (the one deletion this command
+  pre-approves).
 
 ## Phase 0 — Scope gate (one unit per run)
 Resolve what's being redesigned to a single unit:
@@ -100,7 +103,8 @@ behavior goes through `/genesis:spec`. Tell me what you logged.
 - If the design needs an icon/image asset that wasn't provided, finish what you can
   but don't mark it `done` — **blocked-on-asset**, log a finding (no emoji/placeholder
   stand-ins).
-- If a spec/roadmap slice tracks this, update its status.
+- If a spec/roadmap slice tracks this, update its status: `done` only if nothing
+  is blocked; otherwise `blocked — <what's missing>`, and leave **Next up** on it.
 - Summarize: states restyled, behavior net still green, consumers checked (if a
   shared component), new features logged for separate speccing, anything left open.
 

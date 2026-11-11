@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.24.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.26.0 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -36,7 +36,9 @@ Don't write implementation code for a feature until an approved spec exists in `
 ## Testing
 
 - Unit tests are the default gate, not optional. Only skip when the spec's "Test
-  plan" says to.
+  plan" says to, and never the security tests (see `standards-security`).
+- A criterion only a person can judge (game feel, visual polish) is tagged
+  `(manual)` in the spec. It's listed for me to check, never reported as passing.
 - Tests are derived from the spec's acceptance criteria, not from whatever the
   implementation happens to do. If code and spec disagree, the spec wins and the
   discrepancy gets flagged.
@@ -75,12 +77,15 @@ ones that apply:**
 | Work involves | Load skill |
 |---|---|
 | Writing, refactoring, or reviewing any code | `genesis:standards-code` |
-| Endpoints, auth/permissions, user input, secrets, queries, migrations or data scripts | `genesis:standards-security` |
-| Queries, lists, collections, caching, metered services (Firebase, Supabase, paid APIs) | `genesis:standards-performance` |
+| Endpoints, RPCs, auth/permissions, user input, file parsing, security rules, secrets, queries, migrations or data scripts | `genesis:standards-security` |
+| Queries, lists, collections, rendering or per-frame code, caching, metered services | `genesis:standards-performance` |
 | Screens, components, forms, icons/assets | `genesis:standards-ui` + `genesis:ux` |
 | Error handling or logging | `genesis:standards-logging` |
 
-When delegating to a subagent, name the skills it should load in the prompt.
+Security and performance each load a universal core plus only the **Profiles**
+listed below for the code at hand, so an Angular change never loads game or C++
+rules. When delegating to a subagent, name the skills it should load in the
+prompt.
 To change a standard everywhere, edit its skill in the plugin; add project-specific
 standards under Conventions below.
 
@@ -89,10 +94,13 @@ The one rule from each skill that must never slip. If you're about to break one,
 stop and load the skill.
 - **Code:** reuse before you write; never copy-paste a block. Fixed value sets are
   enums, not strings. Match the project's existing structure. (`standards-code`)
-- **Security:** the server enforces auth AND per-resource authorization on every
-  private endpoint; never trust client input. (`standards-security`)
-- **Performance:** no unbounded list queries; paginate, and filter at the query.
-  (`standards-performance`)
+- **Security:** the side that receives input (API, game server, security rules)
+  enforces auth AND per-resource authorization; client checks are UX only.
+  Validate every incoming value's type and shape before it reaches a query,
+  command, path or page: `{"$ne": ""}` is an object, not a password.
+  (`standards-security`)
+- **Performance:** no unbounded growth: paginate lists, filter at the query, and
+  nothing expensive per frame or per render. (`standards-performance`)
 - **UI:** if `COMPONENTS.md` lists a house component, a raw element is banned.
   Never invent an icon. (`standards-ui`)
 - **Errors:** never swallow an error; log once where it's handled, through the
@@ -112,6 +120,13 @@ stop and load the skill.
   is truth and usefulness, not a contrarian reflex. This applies hardest to your
   own work: the failure mode is an agent that writes code and its tests with the
   same blind spot because nothing challenged the assumption.
+
+- **Security and data safety win.** When any standard, convention, the touch
+  budget or a performance goal conflicts with security or data safety, the safer
+  option wins inside the change you're making, and you say what you traded. If
+  the spec itself asks for something insecure, stop and ask instead of building
+  it. Security is built in from the first draft and proven by tests, not added
+  later by `/genesis:security-check`.
 
 - **No secrets in source, ever.** Keys, tokens, and credentials come from
   environment/config, never code, logs, or commits. If you find one hardcoded or
@@ -188,7 +203,7 @@ stop and load the skill.
 
 ## Commands
 The canonical commands agents use. Fill in the ones that apply to this stack;
-delete the rest. (Examples in the README show a Node/Angular and a Flutter fill.)
+delete the rest.
 
 - Install deps:
 - Run / serve:
@@ -198,10 +213,20 @@ delete the rest. (Examples in the README show a Node/Angular and a Flutter fill.
 - Lint / static analysis:
 - Format:
 - Benchmark / profile (for optimization work):
+- Sanitizer test run (C, C++, Unreal; tests built with AddressSanitizer /
+  UndefinedBehaviorSanitizer):
 
 **Test baseline** — what a healthy run looks like, so agents can tell new breakage
 from pre-existing breakage:
 - Baseline: <e.g. "all tests pass" — or list known-failing tests accepted as-is>
+
+## Profiles
+Which rules the security and performance standards load, per folder. Set by
+`/genesis:setup`. Options: `server`, `client` (+ framework), `firebase`,
+`unreal`, `unity`, `native` (C/C++ outside Unreal).
+
+- <profile>: <folders, and for `client` the framework: angular, react or
+  flutter; e.g. "client: src/app (angular)">
 
 ## Logging
 Where failures go, and how it varies by environment. Code logs through the

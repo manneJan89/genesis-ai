@@ -41,6 +41,8 @@ outcome. This is what the test-writer and e2e-tester work from, so be precise.
 - [ ] ...
 - [ ] Edge case: ...
 - [ ] Error case: ...
+- [ ] (manual) ... — only for what a person must judge (game feel, visual polish);
+      listed for me to check, never claimed as passing by a test
 
 ## UI / design — features with a UI only
 - **Design source**: <inherited from roadmap | existing design system | repo file
@@ -49,13 +51,20 @@ outcome. This is what the test-writer and e2e-tester work from, so be precise.
 - **New UI conventions** (only if inventing): <spacing, colour, type choices made>
 - Leave this section out for non-UI features.
 
-## Security — features touching endpoints, data, or user input
+## Security — features with an entry point (endpoint, RPC, rules, parser, input)
+Designed here, built in from the first draft, and turned into tests first.
+- **Entry points**: each endpoint / RPC / callable / rule / parser this adds or
+  changes, and which side enforces it (server, security rules, game server)
 - **Access**: public | authenticated (which roles / ownership rule)
 - **Authorization**: per-resource check (can user A act on B's data?) — how enforced
-- **Server-side validation**: what's validated/sanitized at the boundary (never
-  trust the client)
+- **Input schema**: for each entry point, the exact fields, types, ranges and
+  lengths accepted; everything else is rejected. Fields the client may NOT set
+  (role, ownerId, balance) named explicitly.
+- **Abuse cases**: what a hostile caller would try here (another user's id, an
+  object where a string goes, an out-of-range RPC value, a huge payload) and the
+  expected rejection. These become the security tests.
 - **Secrets/config**: what comes from env (never hardcoded)
-- Omit only for features with genuinely no security surface (pure UI, no data).
+- Omit only for features with genuinely no entry point (pure UI, no data).
 
 ## Performance budget
 Measurable targets, or "none required".

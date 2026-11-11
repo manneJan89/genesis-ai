@@ -1,7 +1,7 @@
 ---
 description: Review existing code for bugs, performance risks, and standards violations
 argument-hint: [file, feature, module, or "recent changes"]
-allowed-tools: Read, Grep, Glob, Bash, Skill
+allowed-tools: Read, Grep, Glob, Skill, Bash(git status*), Bash(git diff*), Bash(git log*), Bash(git show*)
 ---
 
 Review this and report what's wrong with it: $ARGUMENTS

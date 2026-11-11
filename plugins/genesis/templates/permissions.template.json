@@ -43,6 +43,14 @@
       "Bash(* --purge*)",
       "Bash(* --wipe*)",
       "Bash(* --truncate*)",
+      "Bash(rm -*r*)",
+      "Bash(rm -*R*)",
+      "Bash(rm * -*r*)",
+      "Bash(rm * -*R*)",
+      "Bash(rm --recursive*)",
+      "Bash(rm * --recursive*)",
+      "Bash(find * -delete*)",
+      "Bash(xargs *rm*)",
       "Bash(zsh -c *)",
       "Bash(sh -c *)",
       "Bash(bash -c *)",
@@ -79,7 +87,13 @@
       "PowerShell(git reset *)",
       "PowerShell(git clean *)",
       "PowerShell(git branch *)",
-      "PowerShell(Remove-Item *)"
+      "PowerShell(Remove-Item *)",
+      "PowerShell(rm *)",
+      "PowerShell(del *)",
+      "PowerShell(erase *)",
+      "PowerShell(rd *)",
+      "PowerShell(ri *)",
+      "PowerShell(rmdir *)"
     ]
   }
 }

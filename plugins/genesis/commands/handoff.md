@@ -1,7 +1,7 @@
 ---
 description: Write, resume from, or clear HANDOFF.md, the note that lets the next session carry on where this one stopped
 argument-hint: (none = write it now) | "resume" | "clear"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash(git branch --show-current), Bash(git rev-parse *), Bash(git status*), Bash(git diff*), Bash(git log*), Bash(git show*), Bash(rm HANDOFF.md)
 ---
 
 Handoff action: ${ARGUMENTS:-write}
@@ -52,7 +52,7 @@ If `HANDOFF.md` doesn't exist, say so, and fall back to the roadmap's **Next up*
 (`/genesis:roadmap` with no arguments shows it) and `git log`.
 
 ## "clear": delete it
-Delete `HANDOFF.md`. Do this when the work it describes is finished or abandoned.
+Delete it with exactly `rm HANDOFF.md`. Do this when the work it describes is finished or abandoned.
 Before deleting, check its **Decisions not yet in the spec** and **Open questions**:
 if anything there isn't recorded somewhere permanent (the spec, the roadmap,
 `FINDINGS.md`), tell me first and offer to move it, because deleting the handoff

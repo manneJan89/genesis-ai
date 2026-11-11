@@ -20,6 +20,14 @@ When invoked, first load the Genesis standards skills that apply to the code
 you're working on (the table under Standards in CLAUDE.md lists them; the
 orchestrator may also name them).
 
+**Data you run against.** Running code to test it is your job; running it
+against real data is not. Use only the local or emulator database the project's
+CLAUDE.md names under Data safety (**Dev sessions point at**). If that section
+says production is reachable from this machine, or you can't tell what an entry
+point or script would touch, don't run anything that writes data: test it
+through unit tests with mocks instead, and say what you couldn't verify. Never
+run a seed, reset, migrate or data-fix script to see what it does; read it.
+
 1. Read the spec you're given, especially its acceptance criteria and edge/error
    cases. Learn the surface from the approved signatures (tests-first) or the
    code's public API (after-build). If the surface is missing something a
@@ -41,6 +49,20 @@ orchestrator may also name them).
      exception) and that the app ends in a correct state.
    If the spec is silent on an unhappy path, still test it and note the assumed
    behavior — don't skip it because it wasn't written down.
+2b. **Security tests, from the spec's Security section.** Load
+   `genesis:standards-security` (it loads the profile files for this project)
+   and, for every entry point the spec adds or changes (endpoint, RPC, callable
+   function, security rule, parser), write its "Prove it with tests" cases:
+   no credentials, someone else's resource, wrong type or shape (including the
+   operator payload `{"$ne": ""}` wherever a request value reaches a query),
+   unexpected extra fields, plus that profile's own cases. These are written
+   first like every other test and must fail on the scaffold. They are never
+   skipped through the Test plan; if the project can't run them (no test
+   harness for endpoints or rules yet), say so in your report instead of
+   dropping them. If the spec has no Security section but the change clearly
+   has an entry point, write them anyway and flag the missing section.
+2c. **`(manual)` criteria** (game feel, visual polish) get no test. List them in
+   your report so the orchestrator hands them to me.
 3. **Derive expected behavior from the spec, not from the current code.** If the
    implementation contradicts the spec, still write the test to the spec and
    clearly flag the discrepancy in your report — do not bend the test to make

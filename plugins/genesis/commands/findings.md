@@ -1,7 +1,7 @@
 ---
 description: Review and act on the findings backlog — out-of-scope issues logged during other work
 argument-hint: (none = list open) | a finding to act on
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
+allowed-tools: Read, Write, Edit, Grep, Glob, Agent
 ---
 
 Work the findings backlog at `FINDINGS.md` (repo root).

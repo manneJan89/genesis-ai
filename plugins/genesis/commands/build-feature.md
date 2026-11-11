@@ -1,7 +1,7 @@
 ---
 description: Build a feature from an approved spec, then test, fix, and verify it
 argument-hint: [path/to/spec.md]
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, Skill
+allowed-tools: Read, Write, Edit, Grep, Glob, Agent, Skill, Bash(rm HANDOFF.md)
 ---
 
 Orchestrate the full build pipeline for the spec at: $ARGUMENTS
@@ -23,13 +23,16 @@ ends. Format: `${CLAUDE_PLUGIN_ROOT}/templates/HANDOFF.template.md`.
 - **At the end of every phase:** overwrite it with where this run stands (phase
   reached, done, half-done, the exact next step, open questions, decisions not yet
   in the spec). Take **Branch** and **HEAD** from git. Keep it short. Don't commit it.
+  Plan mode blocks file writes, so while it's on, skip the write and do it as
+  soon as I approve the plan.
 - **Whenever the run stops early** (waiting for my approval, a gate or stop rule,
   the fix-loop cap, blocked on an asset, or me telling you to stop): write it
   before you stop. That is when it matters most. Make **Next step** say what
   unblocks the work.
 - **When the work is done:** move anything in its decisions or open questions
   that isn't recorded permanently into the spec, the roadmap or `FINDINGS.md`,
-  then delete `HANDOFF.md`.
+  then delete it with exactly `rm HANDOFF.md` (the one deletion this command
+  pre-approves).
 
 ## Phase 0 — Route silently (new vs build-upon-existing)
 `build-feature` is the single entry point: "I planned it, now build it" — whether
@@ -149,15 +152,32 @@ whole feature. Repeat until the suite is green against every acceptance criterio
 or until you hit a blocker you can't resolve — in which case stop and report it
 rather than hacking around the spec.
 
-**Cap the loop at 3 fix cycles.** If it's not green after three build→test→fix
+**Cap the loop at 3 fix cycles.** The cap holds even if a `/goal` or other
+loop is set: at three, stop and report. If it's not green after three build→test→fix
 passes, stop and report what's still failing, your best hypothesis, and what you'd
 try next — do not keep regenerating code. Repeated failure usually means the spec
 or the approach is wrong, not that another cycle will fix it, and each cycle
 re-emits the whole change. Getting my input is cheaper than a fourth blind pass.
 
-> Tip: for a hands-off version of this loop, I can instead run
-> `/goal all tests pass and the acceptance criteria in <spec> are met`
-> and let Claude iterate build → test → fix → re-test on its own.
+## Phase 6.5 — Security pass (when the change touches the trust boundary)
+Run this if the change touched any of: endpoints or route handlers, RPCs or
+callable functions, auth or permission code, security rules files, database
+queries built from input, input parsing or deserialization, file uploads or
+paths, or anything named in the spec's Security section. Size doesn't matter:
+the most dangerous edit is often one line that drops a check. Skip it, and say
+so, only when the change touched none of these.
+
+1. Delegate to the **security-reviewer** subagent with the spec path, the
+   changed files, and the entry points added or altered. It reads, it doesn't
+   edit.
+2. For each finding scored 70 or above: the **test-writer** turns its "failing
+   test that would prove it" into a real test, you confirm it fails, then the
+   **bug-fixer** fixes it and the full suite runs.
+3. **Cap at 2 rounds.** Anything critical or high still open after that blocks
+   `done`: stop and report it, don't ship around it. Medium and low go to
+   `FINDINGS.md` with the reviewer's details.
+4. Its "outside this change" list goes to `FINDINGS.md` (critical or high there:
+   log it and stop, per the core rule).
 
 ## Phase 7 — Performance
 Check the spec's performance budget. If one exists, verify it with a concrete
@@ -180,9 +200,13 @@ numbers against the target. If no budget was specified, say so and move on.
 ## Phase 8 — Update the roadmap (if any)
 If the spec header names a roadmap (`Roadmap: specs/roadmaps/<name>.md (slice N …)`),
 open that roadmap and:
-- mark this slice `done`,
+- set this slice's status from the outcome, not the code: `done` only if Phase
+  7.5 passed; if the work ended **blocked-on-asset** (or blocked for any other
+  reason), set `blocked — <what's missing>` and leave **Next up** pointing at
+  this slice,
 - fill in its Spec column with a relative link to the spec,
-- move **Next up** to the first remaining non-done slice,
+- if (and only if) it's `done`, move **Next up** to the first remaining non-done
+  slice,
 - update Last updated.
 
 If a shared decision changed during this build (schema, enum, side-effect rule),
@@ -193,8 +217,10 @@ If the spec names no roadmap, skip this phase.
 
 ## Phase 9 — Summary
 Report: what was built, which acceptance criteria now pass, test results
-(including how many tests went red → green),
-performance numbers, and anything left open or descoped.
+(including how many tests went red → green, and how many of those are security
+tests), the security pass result (or why it was skipped), performance numbers,
+any `(manual)` criteria for me to check by hand, and anything left open or
+descoped.
 
 If the work is finished, clear `HANDOFF.md` as described under Handoff. If it
 ended blocked, leave it, with **Next step** saying what unblocks it.

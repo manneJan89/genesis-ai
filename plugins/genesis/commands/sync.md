@@ -13,7 +13,12 @@ findings-capture rule, design gate, modification contract, logging, security,
 scale, etc. — don't reach an existing project until this sync runs.
 
 ## 1. Compare
-Read the project's `CLAUDE.md` and the current template at
+If `CLAUDE.md` imports `@CLAUDE.genesis.md`, the Genesis rules live in that file:
+compare and update it instead, and leave `CLAUDE.md` alone. If a
+`CLAUDE.genesis.md` exists but `CLAUDE.md` has no `@CLAUDE.genesis.md` line, the
+rules aren't loading at all; tell me, and offer to add the line.
+
+Read the project's `CLAUDE.md` (or `CLAUDE.genesis.md`) and the current template at
 `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.template.md`. Focus on the **rule
 sections** that ship in the template — Standards, and the workflow/testing/
 token-hygiene guidance above the per-project block. Diff them:
@@ -21,23 +26,33 @@ token-hygiene guidance above the per-project block. Diff them:
 - rules **changed** in the template → candidates to update
 - rules I appear to have **customized** locally → flag, don't overwrite
 
-Do NOT touch my **PER-PROJECT block** (Project, Commands, Component libraries,
-Conventions, Codebase map, Logging destinations, Test baseline, Data safety) —
+Do NOT touch my **PER-PROJECT block** (Project, Commands, Profiles, Component
+libraries, Conventions, Codebase map, Logging destinations, Test baseline, Data
+safety) —
 those are mine and project-specific. Sync only the shared rule sections.
 
 **Exception — a per-project section that doesn't exist yet.** If the template
 has a per-project section my CLAUDE.md lacks entirely (e.g. **Data safety**,
-added in v0.22.0), add it, then fill it by running that section's step from
-`/genesis:setup` (for Data safety: ask me, read config structure only, never
-connect to a database or print a secret value). Never overwrite a section that
-already exists.
+added in v0.22.0, or **Profiles**, added in v0.26.0), add it, then fill it by
+running that section's step from `/genesis:setup` (for Data safety: ask me,
+read config structure only, never connect to a database or print a secret
+value; for Profiles: classify the code as setup step 2 does and show me the
+list). Never overwrite a section that already exists. The same goes for a new
+line in an existing per-project section (e.g. the **Sanitizer test run**
+command): add the line, fill it if it applies, and leave the rest alone.
+
+**Profiles matter most.** Without a Profiles section the security and
+performance skills have to guess which rules apply, so on a pre-0.26 project,
+still offer the Profiles step if I decline everything else, and say why.
 
 **Permission guardrails.** Compare the project's `.claude/settings.json` and
 `.claude/settings.local.json` against
 `${CLAUDE_PLUGIN_ROOT}/templates/permissions.template.json`. If the template has
 `deny` or `ask` rules the project lacks, list them in plain words and offer to add
 them, following the merge rules in setup's Permission guardrails step (merge,
-never replace; never add `allow` rules; say what they don't cover). If CLAUDE.md
+never replace; the only `allow` rules are the exact test and lint commands; say
+what they don't cover). If the project has no `allow` rule for its test command,
+offer it: since v0.25 Genesis commands no longer pre-approve shell commands. If CLAUDE.md
 → Data safety records that I declined the guardrails, mention the new rules once
 and don't push.
 
