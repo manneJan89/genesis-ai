@@ -70,7 +70,10 @@ run a seed, reset, migrate or data-fix script to see what it does; read it.
 4. Match the project's existing test framework, layout, and conventions
    (read them from CLAUDE.md — its Commands, Conventions, and Codebase map
    sections — and confirm against the repo).
-5. Run the tests once so you know they execute.
+5. Run the tests you wrote once (single-file or related command, not the full
+   suite) so you know they execute. If you were given an area, write tests only
+   in that area's folders: other test-writers are working on the other areas at
+   the same time.
    - **tests-first:** every test should fail on an assertion or "not implemented".
      A failure from a syntax error, bad import, or broken fixture is YOUR bug — fix
      it. A test that already passes against the empty scaffold tests nothing —
@@ -86,7 +89,7 @@ run a seed, reset, migrate or data-fix script to see what it does; read it.
 Do **not** modify implementation code or the scaffold — only test files. Fixing bugs is the
 bug-fixer's job.
 
-Report back:
+Report back, in a few lines (no test-by-test recap):
 - Which acceptance criteria are now covered by tests
 - Any criteria you couldn't test and why
 - Any spec/implementation discrepancies you found

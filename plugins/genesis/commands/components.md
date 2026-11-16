@@ -1,6 +1,6 @@
 ---
 description: View or manage the shared UI component manifest (COMPONENTS.md)
-argument-hint: (none = list) | "scan" to find candidates | a component to add/update
+argument-hint: (none = list) | "scan" to find candidates | "guard" to add the guard test | a component to add/update
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
@@ -24,7 +24,28 @@ Search the codebase for existing shared/reusable UI components (component select
 `*-button`/`*-input`-style names, a components/ directory, the project's component
 library). Propose entries — component, what it's for, its API, what it can/can't do
 — and, on my okay, write them into `COMPONENTS.md`. Confirm each; don't guess an
-API you didn't read.
+API you didn't read. Then offer the guard test (`guard` below): the manifest says
+what to use, the guard makes sure it's used.
+
+## "guard" — add the component guard test
+A check that can't be forgotten: a test in the project's own test framework that
+fails when a raw element appears where a house component exists. It runs with
+every test run, so the build loop catches it like any other failing test.
+
+1. Collect each registered component's **Replaces** list (ask me to fill any that
+   are missing; don't guess).
+2. Write one test file (e.g. `component-guard.spec.ts`, `component_guard_test.dart`)
+   that scans the project's UI files (templates, `.html`, `.tsx`, widget files),
+   skips each house component's own folder, and fails with `file:line → use
+   <component>` for every hit. Plain file reading and string or regex matching:
+   no new dependencies.
+3. For React, mention the alternative of ESLint's `react/forbid-elements` rule,
+   which flags it in the editor too; I choose.
+4. Show me the test and its first run before keeping it. Existing violations make
+   it red: list them and ask whether to fix them now (each swap is a small
+   change) or start the guard with them on an allowlist that only shrinks.
+
+Re-run `guard` after adding a component, so the test learns its Replaces list.
 
 ## A component named — add or update
 Add or update that component's entry (use-for, location, API, can, can't). Keep

@@ -28,13 +28,16 @@ run a seed, reset, migrate or data-fix script to see what it does; read it.
    not refactor unrelated code, change behavior outside the reported bug, or
    alter the spec. Do not edit a spec-derived test to make it pass — if a test
    looks wrong, report it instead.
-4. Verify: re-run the failing test/repro and confirm it passes, and run nearby
-   tests to check you didn't break anything adjacent.
+4. Verify: re-run the failing test/repro and confirm it passes, and run the
+   tests related to the files you changed (the "related" or single-file command
+   from CLAUDE.md), not the full suite: the orchestrator runs that once at the
+   end. If you were told other bug-fixers are working in parallel, touch only
+   the files for your bugs.
 
-Report back:
-- Root cause (one or two sentences)
-- Exactly what you changed and why
-- Verification result (what you re-ran and the outcome)
+Report back, in a few lines:
+- Root cause (one sentence)
+- What you changed (files)
+- Verification result
 - Any risk or follow-up you noticed but intentionally left alone
 
 If the correct fix would require changing the spec or touching out-of-scope

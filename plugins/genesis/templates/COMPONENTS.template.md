@@ -14,6 +14,9 @@ build updates its entry. You can also add/edit entries by hand. Manage with
 
 ## <ComponentSelector or Name>   — e.g. surespace-button
 - **Use for**: <the primitive it replaces — e.g. all buttons>
+- **Replaces**: <the raw elements it bans outside its own folder, exactly as
+  written in templates — e.g. `<button`, `<input type="checkbox"`; the
+  component guard test checks these>
 - **Location**: <path>
 - **API**: <key inputs/props — e.g. tone="brand|danger", [disabled], (click)>
 - **Can**: <what it supports>

@@ -32,7 +32,8 @@ folder; `*.asmdef` files), other .NET (`*.csproj`), etc., plus the presence of a
 
 ## 2. Propose the per-project config
 Show me a filled-in **Commands** block (install, run, build, test-all,
-test-single, lint, format, benchmark, and for C, C++ and Unreal a sanitizer test
+test-single, test-related (only the tests affected by given files; this is what
+keeps build loops fast), lint, format, benchmark, and for C, C++ and Unreal a sanitizer test
 run) and a first-draft **Codebase map** based on what you found. State your
 confidence and flag anything you're unsure about. Let me correct it before you
 write anything.
