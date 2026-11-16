@@ -156,7 +156,7 @@ already there.
 
 Build as **Areas and the contract → Building per area** describes: yourself
 for one area, parallel **area-builder** subagents for several, then the join
-(full suite once, plus lint/type-check).
+(affected tests and lint once).
 
 **Don't edit a test to make it pass.** If a test looks wrong (it contradicts the
 spec, or asserts something the spec never said), stop and show me the test, the
@@ -170,7 +170,7 @@ touched UI), launched together.
 
 ## Phase 6 — Fix loop
 Follow **Fix loop** in the shared file (related tests while fixing, re-run only
-checks that had findings, cap 3 cycles and 2 for security, full suite once at
+checks that had findings, cap 3 cycles and 2 for security, affected tests once at
 the end).
 
 ## Phase 7 — Performance
@@ -214,7 +214,7 @@ If the spec names no roadmap, skip this phase.
 Short. A few lines, in this shape, and nothing else unless something needs me:
 
     Built: <one line>
-    Tests: <passed>/<total> (<n> new, <n> of them security); full suite green
+    Tests: <passed>/<total> (<n> new, <n> of them security); affected tests green (<n> projects)
     Checks: security <clean | n fixed | skipped: why>, components <clean | n swapped>
     Time: plan <m>, tests <m>, build <m>, checks <m>, fixes <m>
     Needs you: <(manual) criteria to check, partial component matches, open items; or "nothing">

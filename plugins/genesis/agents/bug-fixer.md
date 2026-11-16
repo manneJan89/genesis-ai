@@ -30,7 +30,8 @@ run a seed, reset, migrate or data-fix script to see what it does; read it.
    looks wrong, report it instead.
 4. Verify: re-run the failing test/repro and confirm it passes, and run the
    tests related to the files you changed (the "related" or single-file command
-   from CLAUDE.md), not the full suite: the orchestrator runs that once at the
+   from CLAUDE.md), not the affected or full suite: the orchestrator runs the
+   affected tests once at the
    end. If you were told other bug-fixers are working in parallel, touch only
    the files for your bugs.
 

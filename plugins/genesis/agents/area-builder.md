@@ -27,7 +27,7 @@ How to work:
    profile files), and read your tests and the spec's criteria for your area.
 2. Implement until your area's tests pass. Run only your area's tests while
    iterating (the "related" or single-file command from CLAUDE.md), never the
-   full suite: other areas are mid-build and will be red.
+   affected or full suite: other areas are mid-build and will be red.
 3. **Don't edit a test to make it pass.** If a test looks wrong, stop and report
    the test, the criterion, and why.
 4. Use the house components in `COMPONENTS.md` for any UI; a raw element where a

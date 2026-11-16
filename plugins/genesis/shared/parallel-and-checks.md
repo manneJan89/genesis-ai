@@ -40,15 +40,15 @@ the contract files. Frontend tests mock the backend through the contract.
   standards skills to load. If one reports a contract gap or an outside-budget
   file, stop the affected area, settle it with me, update the contract yourself,
   and restart only the areas it affects.
-- **Join:** when every area is green, run the **full suite once** and the
-  project's lint/type-check. This is where the areas meet: a mismatch between
+- **Join:** when every area is green, run the **affected** tests and lint once
+  (CLAUDE.md "affected" commands; the full suite only if the stack has none). This is where the areas meet: a mismatch between
   frontend and backend shows up here.
 
 ## Checks, in parallel
 Launch these in **one message**, so they run at the same time. None of them
 edits code:
 - **e2e-tester:** run the feature against the spec's acceptance criteria;
-  report bugs. Tell it the full suite just ran green at the join, so it doesn't
+  report bugs. Tell it the affected tests just ran green at the join, so it doesn't
   run it again.
 - **security-reviewer**, if the change touches the trust boundary: endpoints or
   route handlers, RPCs or callable functions, auth or permission code, security
@@ -83,4 +83,5 @@ them. Medium and low security findings go to `FINDINGS.md`, as does the
 reviewer's "outside this change" list (critical or high there: log it and stop,
 per the core rule).
 
-When the loop ends green, run the **full suite once** to confirm.
+When the loop ends green, run the **affected** tests and lint once to confirm.
+Never the whole repo unless I ask.

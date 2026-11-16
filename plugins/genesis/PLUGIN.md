@@ -264,10 +264,15 @@ ran after every fix. Now:
   two 40-second agents launched together finished in 50 seconds, not 80.
 - **Checks in parallel.** After the build, the e2e-tester, security-reviewer
   and component-moderator run together.
-- **Related tests while iterating.** Builders and fixers run only the tests
-  related to what changed (setup records a "related tests" command, e.g.
-  `jest --findRelatedTests`); the full suite runs once at the join and once
-  at the end. Re-checks only re-run the checks that found something.
+- **Three test levels.** While iterating, builders and fixers run only their
+  own tests and those related to the changed files (`jest --findRelatedTests`).
+  Before "done", the **affected** tests and lint run once: everything the change
+  could reach (`nx affected`, `turbo --filter=...[main]`,
+  `jest --changedSince=main`), so a small feature in one project doesn't re-run
+  every project. The whole repo runs only when you ask, or in CI. Affected
+  detection follows imports, so it can miss runtime-only links (config read by
+  name); CI's full run catches those. Re-checks only re-run the checks that found
+  something.
 - **Phase timings** in every build summary, so a slow phase is visible.
 
 Parallel costs about the same tokens (each agent starts fresh either way); it

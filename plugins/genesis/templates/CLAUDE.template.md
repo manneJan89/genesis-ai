@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.27.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.27.1 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -50,11 +50,16 @@ Don't write implementation code for a feature until an approved spec exists in `
   live in the paths nobody asserted, so these are not optional.
 - Use the **commands defined below** to run tests, lint, build, and benchmark —
   never assume a command; read it from this file.
-- **Run the smallest test set that proves the point.** While iterating (building,
-  fix loops), run only the tests related to what changed (the "related" command,
-  else single files). Run the full suite once before calling work done, and once
-  when parallel work is joined. Running everything after every edit is the main
-  reason builds are slow.
+- **Run the smallest test set that proves the point.** Three levels:
+  1. While iterating (building, fix loops): the tests you wrote plus those
+     related to the changed files (the "related" command, else single files).
+  2. Before calling work done, and when parallel work is joined: the
+     **affected** tests and lint, i.e. everything the change could reach (the
+     "affected" commands), once. This is the regression check.
+  3. The whole repo: only when I ask, or in CI. Never by default for a feature.
+  If the stack has no affected command, use the full suite at level 2 and say
+  so in the summary. Running everything after every edit is the main reason
+  builds are slow.
 - A feature is "done" only when its acceptance criteria pass and its performance
   budget (if any) is met.
 
@@ -223,12 +228,18 @@ delete the rest.
 - Install deps:
 - Run / serve:
 - Build:
-- Test (all):
+- Test (all; whole repo, only on request or in CI):
+- Test (affected; everything the change could reach, used before calling work
+  done; e.g. `npx nx affected -t test --base=main`, `npx turbo run test
+  --filter=...[main]`, `npx jest --changedSince=main`; working directly on main,
+  use `HEAD` as the base):
 - Test (single file/pattern):
 - Test (only tests related to changed files; e.g. `npx jest --findRelatedTests
   <files>`, `npx vitest related <files>`, `flutter test <test files>`; leave
   blank if the stack has no such command, and the single-file command is used):
 - Lint / static analysis:
+- Lint (affected; e.g. `npx nx affected -t lint --base=main`, or the linter on
+  the changed files only):
 - Format:
 - Benchmark / profile (for optimization work):
 - Sanitizer test run (C, C++, Unreal; tests built with AddressSanitizer /
