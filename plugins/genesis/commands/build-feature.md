@@ -1,7 +1,7 @@
 ---
 description: Build a feature from an approved spec, then test, fix, and verify it
 argument-hint: [path/to/spec.md]
-allowed-tools: Read, Write, Edit, Grep, Glob, Agent, Skill, Bash(rm HANDOFF.md)
+allowed-tools: Read, Write, Edit, Grep, Glob, Agent, Skill, Bash(rm HANDOFF.md), Bash(date *)
 ---
 
 Orchestrate the full build pipeline for the spec at: $ARGUMENTS
@@ -14,6 +14,10 @@ you give them).
 
 Delegate to subagents **by name explicitly** at each step — don't assume Claude
 will auto-route to them.
+
+**Read `${CLAUDE_PLUGIN_ROOT}/shared/parallel-and-checks.md` now.** It holds the
+rules for running agents in parallel, timing phases, splitting work into areas
+around a contract, and the checks and fix loop (Phases 5 and 6 below).
 
 ## Handoff (keep it current as you go)
 This run keeps `HANDOFF.md` current so a later session can carry on if this one
@@ -44,7 +48,9 @@ Glob/grep for the files, screens, or modules this spec targets:
 - **Targets already exist → build UPON them.** You are adding to existing code, not
   replacing it. Before changing an existing file, lay a **characterization net**
   over its current behavior (delegate to the **characterization-tester** subagent)
-  so any accidental change to existing behavior turns a test red. Then apply the
+  so any accidental change to existing behavior turns a test red. When the
+  touched files fall in more than one area, run one characterization-tester per
+  area, in parallel. Then apply the
   **modification contract**: add/modify only what this spec names, and leave all
   other code — and all existing UI/design — byte-for-byte intact. Never rewrite a
   working page/function the spec didn't ask you to change. This is what stops a new
@@ -75,8 +81,19 @@ create; for existing code, the exact files AND the functions/sections within the
 you'll modify — everything else stays untouched. Name the **public surface** you'll
 add (functions, classes, components, endpoints — with signatures), since the tests
 in Phase 3 are written against it before any logic exists. Map the work to each
-acceptance criterion. Stop and let me approve the touch budget before writing code.
-For anything large, propose reviewable chunks rather than one big pass.
+acceptance criterion.
+
+If the feature spans more than one area (backend, frontend, security rules, a
+game module), split it as **Areas and the contract** describes.
+
+**UI: name the house component for each element.** For every button, input,
+dialog, list or other UI element the plan adds, name the `COMPONENTS.md`
+component it will use, or "raw — none registered". Choosing at plan time is
+cheaper than swapping after the build.
+
+Stop and let me approve the touch budget (and the area split, if any) before
+writing code. For anything large, propose reviewable chunks rather than one big
+pass.
 
 **Data operations:** if the plan includes anything that writes to data outside a
 local or emulator database (migration, backfill, bulk update or delete, data-fix
@@ -101,15 +118,21 @@ Skip this phase for backend/data/logic-only features.
 Unless the spec's Test plan says to skip unit tests, the tests are written
 **before the implementation**, from the spec alone:
 
-1. **Scaffold the surface.** Create the files and the public signatures named in
-   the approved plan with no behavior — bodies that throw "not implemented" (or
-   the stack's equivalent). This is only so the tests compile; write no logic.
-   For build-upon-existing, lay the characterization net first (Phase 0).
-2. **Delegate to the test-writer subagent in `tests-first` mode:**
+1. **Write the contract, then scaffold the surface.** If the plan has areas,
+   write the contract files first, in full (types and shapes are not behavior).
+   Then create the files and public signatures named in the plan with no
+   behavior — bodies that throw "not implemented" (or the stack's equivalent).
+   This is only so the tests compile; write no logic. For build-upon-existing,
+   lay the characterization net first (Phase 0).
+2. **Delegate to the test-writer subagent in `tests-first` mode**, one per area,
+   all in the same message so they run in parallel (see **Areas and the
+   contract**):
 
        Use the test-writer subagent in tests-first mode to write unit tests for
-       <spec path>. The approved surface is: <signatures from the plan>. Derive
-       every test from the acceptance criteria; no implementation exists yet.
+       <spec path>, <area> only (<folders>). The approved surface is:
+       <signatures>. The contract is: <contract files>. Derive every test from the
+       acceptance criteria for this area; no implementation exists yet. Frontend
+       tests mock the backend through the contract.
 
 3. **Confirm red.** Every new test must fail, and fail for the right reason — an
    assertion or "not implemented", not a syntax error, bad import, or broken
@@ -125,59 +148,30 @@ spec against an empty surface can only encode what the spec promised.
 
 ## Phase 4 — Build (green)
 Load the Genesis standards skills that apply to this feature (see CLAUDE.md →
-Standards) before writing code. Implement the approved plan until the Phase 3
-tests pass. Respect the "Technical
-notes / constraints" and the out-of-scope list in the spec. Keep the change focused
-on this feature. If building upon existing code, stay strictly within the approved
-touch budget — wire new behavior *into* existing structure (for UI, into the
-existing widgets/layout), never rebuild what's already there.
+Standards) before writing code. Respect the "Technical notes / constraints" and
+the out-of-scope list in the spec, and stay strictly within the approved touch
+budget. If building upon existing code, wire new behavior *into* existing
+structure (for UI, into the existing widgets/layout), never rebuild what's
+already there.
+
+Build as **Areas and the contract → Building per area** describes: yourself
+for one area, parallel **area-builder** subagents for several, then the join
+(affected tests and lint once).
 
 **Don't edit a test to make it pass.** If a test looks wrong (it contradicts the
 spec, or asserts something the spec never said), stop and show me the test, the
 criterion, and why you think it's wrong. The test or the spec changes only with my
 say-so.
 
-When the tests are green, run the project's lint/type-check command and fix what
-it reports before moving on.
-
-## Phase 5 — Acceptance / e2e check
-Delegate to the **e2e-tester** subagent to run the suite and exercise the feature
-against the spec's acceptance criteria. It reports bugs; it does not fix them.
-Collect its structured bug list.
+## Phase 5 — Checks, in parallel
+Follow **Checks, in parallel** in the shared file: e2e-tester, security-reviewer
+(when the change touches the trust boundary) and component-moderator (when it
+touched UI), launched together.
 
 ## Phase 6 — Fix loop
-If Phase 5 found bugs, delegate each (or the batch) to the **bug-fixer** subagent
-with the reproduction steps. After fixes land, run the **e2e-tester** again on the
-whole feature. Repeat until the suite is green against every acceptance criterion,
-or until you hit a blocker you can't resolve — in which case stop and report it
-rather than hacking around the spec.
-
-**Cap the loop at 3 fix cycles.** The cap holds even if a `/goal` or other
-loop is set: at three, stop and report. If it's not green after three build→test→fix
-passes, stop and report what's still failing, your best hypothesis, and what you'd
-try next — do not keep regenerating code. Repeated failure usually means the spec
-or the approach is wrong, not that another cycle will fix it, and each cycle
-re-emits the whole change. Getting my input is cheaper than a fourth blind pass.
-
-## Phase 6.5 — Security pass (when the change touches the trust boundary)
-Run this if the change touched any of: endpoints or route handlers, RPCs or
-callable functions, auth or permission code, security rules files, database
-queries built from input, input parsing or deserialization, file uploads or
-paths, or anything named in the spec's Security section. Size doesn't matter:
-the most dangerous edit is often one line that drops a check. Skip it, and say
-so, only when the change touched none of these.
-
-1. Delegate to the **security-reviewer** subagent with the spec path, the
-   changed files, and the entry points added or altered. It reads, it doesn't
-   edit.
-2. For each finding scored 70 or above: the **test-writer** turns its "failing
-   test that would prove it" into a real test, you confirm it fails, then the
-   **bug-fixer** fixes it and the full suite runs.
-3. **Cap at 2 rounds.** Anything critical or high still open after that blocks
-   `done`: stop and report it, don't ship around it. Medium and low go to
-   `FINDINGS.md` with the reviewer's details.
-4. Its "outside this change" list goes to `FINDINGS.md` (critical or high there:
-   log it and stop, per the core rule).
+Follow **Fix loop** in the shared file (related tests while fixing, re-run only
+checks that had findings, cap 3 cycles and 2 for security, affected tests once at
+the end).
 
 ## Phase 7 — Performance
 Check the spec's performance budget. If one exists, verify it with a concrete
@@ -187,8 +181,9 @@ numbers against the target. If no budget was specified, say so and move on.
 ## Phase 7.5 — Component manifest + completion gate
 - **Manifest write-back:** if this feature created or changed a shared UI
   component, update `COMPONENTS.md` (use-for, API, can/can't) so it stays the
-  authoritative registry. If it should have used a house component and didn't,
-  that's a defect — fix it, don't record around it.
+  authoritative registry. The component-moderator's "unregistered" list goes
+  here. If the project has a component guard test (`/genesis:components
+  guard`), add the new component's Replaces list to it.
 - **Completion gate — required assets present?** If the feature needs an
   icon/image/asset that was NOT provided (see the icons-and-assets standard), you
   may finish all the code, but you **must NOT report the feature `done`.** Mark it
@@ -216,11 +211,16 @@ slices depend on it. Do NOT rewrite older specs; they are point-in-time history.
 If the spec names no roadmap, skip this phase.
 
 ## Phase 9 — Summary
-Report: what was built, which acceptance criteria now pass, test results
-(including how many tests went red → green, and how many of those are security
-tests), the security pass result (or why it was skipped), performance numbers,
-any `(manual)` criteria for me to check by hand, and anything left open or
-descoped.
+Short. A few lines, in this shape, and nothing else unless something needs me:
+
+    Built: <one line>
+    Tests: <passed>/<total> (<n> new, <n> of them security); affected tests green (<n> projects)
+    Checks: security <clean | n fixed | skipped: why>, components <clean | n swapped>
+    Time: plan <m>, tests <m>, build <m>, checks <m>, fixes <m>
+    Needs you: <(manual) criteria to check, partial component matches, open items; or "nothing">
+
+Add performance numbers only if the spec had a budget. Don't recap the steps or
+list every file; the diff shows that.
 
 If the work is finished, clear `HANDOFF.md` as described under Handoff. If it
 ended blocked, leave it, with **Next step** saying what unblocks it.

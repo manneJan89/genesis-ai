@@ -11,7 +11,8 @@ and confirm with me before writing files.
 Look for stack signals in the repo root (and one level down): `package.json`,
 `angular.json`, `pubspec.yaml`, `go.mod`, `Cargo.toml`, `pyproject.toml`,
 `requirements.txt`, `pom.xml`, `build.gradle`, `Gemfile`, `composer.json`,
-`firebase.json`, `firestore.rules`, C and C++ build files (`CMakeLists.txt`,
+`firebase.json`, `firestore.rules`, monorepo tools (`nx.json`, `turbo.json`,
+`pnpm-workspace.yaml`, `lerna.json`, workspaces in `package.json`), C and C++ build files (`CMakeLists.txt`,
 `Makefile`, `meson.build`, `vcpkg.json`, `conanfile.txt` / `conanfile.py`,
 `*.sln` / `*.vcxproj`), Unreal (`*.uproject`, a `Source/` folder with
 `*.Build.cs`), Unity (`ProjectSettings/ProjectVersion.txt` with an `Assets/`
@@ -32,7 +33,11 @@ folder; `*.asmdef` files), other .NET (`*.csproj`), etc., plus the presence of a
 
 ## 2. Propose the per-project config
 Show me a filled-in **Commands** block (install, run, build, test-all,
-test-single, lint, format, benchmark, and for C, C++ and Unreal a sanitizer test
+test-single, test-related (only the tests affected by given files; this is what
+keeps build loops fast), test-affected and lint-affected (everything a change
+could reach: `nx affected`, `turbo --filter=...[main]`, `jest --changedSince`;
+this is the regression check before "done", so the whole repo doesn't run for a
+small feature), lint, format, benchmark, and for C, C++ and Unreal a sanitizer test
 run) and a first-draft **Codebase map** based on what you found. State your
 confidence and flag anything you're unsure about. Let me correct it before you
 write anything.

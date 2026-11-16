@@ -13,8 +13,10 @@ When invoked:
 1. Read the spec, focusing on acceptance criteria and the test plan. Criteria
    tagged `(manual)` aren't yours to judge: list them as "for manual check" and
    move on.
-2. Run the full relevant test suite (unit + integration/e2e as configured in the
-   project). Then exercise the feature's behavior against each acceptance
+2. If the orchestrator tells you the affected tests were just run and are
+   green, don't run them again. Otherwise run the affected tests once (the
+   "affected" command in CLAUDE.md; the full suite only if there is none). On a re-check after fixes, run only the tests related to what
+   was fixed and the criteria that failed before. Then exercise the feature's behavior against each acceptance
    criterion — through its real entry points where possible (CLI, API endpoint,
    UI harness, script), not just by re-reading code.
 3. For every failure or gap, capture: what you did, what you expected (cite the

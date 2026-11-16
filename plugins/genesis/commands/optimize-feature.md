@@ -99,7 +99,7 @@ so, only when the change touched none of these.
    edit.
 2. For each finding scored 70 or above: the **test-writer** turns its "failing
    test that would prove it" into a real test, you confirm it fails, then the
-   **bug-fixer** fixes it and the full suite runs.
+   **bug-fixer** fixes it and the affected tests run.
 3. **Cap at 2 rounds.** Anything critical or high still open after that blocks
    `done`: stop and report it, don't ship around it. Medium and low go to
    `FINDINGS.md` with the reviewer's details.

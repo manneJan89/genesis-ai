@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.26.0 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.27.1 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -50,6 +50,16 @@ Don't write implementation code for a feature until an approved spec exists in `
   live in the paths nobody asserted, so these are not optional.
 - Use the **commands defined below** to run tests, lint, build, and benchmark —
   never assume a command; read it from this file.
+- **Run the smallest test set that proves the point.** Three levels:
+  1. While iterating (building, fix loops): the tests you wrote plus those
+     related to the changed files (the "related" command, else single files).
+  2. Before calling work done, and when parallel work is joined: the
+     **affected** tests and lint, i.e. everything the change could reach (the
+     "affected" commands), once. This is the regression check.
+  3. The whole repo: only when I ask, or in CI. Never by default for a feature.
+  If the stack has no affected command, use the full suite at level 2 and say
+  so in the summary. Running everything after every edit is the main reason
+  builds are slow.
 - A feature is "done" only when its acceptance criteria pass and its performance
   budget (if any) is met.
 
@@ -120,6 +130,16 @@ stop and load the skill.
   is truth and usefulness, not a contrarian reflex. This applies hardest to your
   own work: the failure mode is an agent that writes code and its tests with the
   same blind spot because nothing challenged the assumption.
+
+- **Short by default, plain words always.** After a change, report in a few
+  lines: what changed, the test result, anything that needs me. No recap of the
+  steps, no restating what I can see in the diff. Go longer only when planning,
+  weighing options, or when I ask. Questions are one at a time and at most two
+  sentences, with your recommended answer so I can just accept it. The first time
+  you use a term a non-specialist might not know, explain it in a few words in
+  brackets, e.g. "IDOR (one user reaching another user's data by changing an
+  id)". Short is not shallow: keep the pushback and the unhappy paths; cut the
+  padding.
 
 - **Security and data safety win.** When any standard, convention, the touch
   budget or a performance goal conflicts with security or data safety, the safer
@@ -208,9 +228,18 @@ delete the rest.
 - Install deps:
 - Run / serve:
 - Build:
-- Test (all):
+- Test (all; whole repo, only on request or in CI):
+- Test (affected; everything the change could reach, used before calling work
+  done; e.g. `npx nx affected -t test --base=main`, `npx turbo run test
+  --filter=...[main]`, `npx jest --changedSince=main`; working directly on main,
+  use `HEAD` as the base):
 - Test (single file/pattern):
+- Test (only tests related to changed files; e.g. `npx jest --findRelatedTests
+  <files>`, `npx vitest related <files>`, `flutter test <test files>`; leave
+  blank if the stack has no such command, and the single-file command is used):
 - Lint / static analysis:
+- Lint (affected; e.g. `npx nx affected -t lint --base=main`, or the linter on
+  the changed files only):
 - Format:
 - Benchmark / profile (for optimization work):
 - Sanitizer test run (C, C++, Unreal; tests built with AddressSanitizer /

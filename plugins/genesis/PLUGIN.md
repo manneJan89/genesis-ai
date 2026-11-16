@@ -166,7 +166,8 @@ writing (a spec is a few KB). If your bill runs high:
 - `e2e-tester` runs on **Haiku** and reports tersely (no pasted logs); it runs
   on every fix cycle, so it's where a cheap model saves the most. The agents
   whose misses become silent bugs stay on Sonnet: `test-writer`, `bug-fixer`,
-  `security-reviewer`, and `characterization-tester` (a behavior it fails to pin has no safety net,
+  `security-reviewer`, `area-builder`, and `characterization-tester`;
+  `component-moderator` is on Haiku (a mechanical comparison) (a behavior it fails to pin has no safety net,
   so a later change can break it unnoticed).
 - **Smaller slices win**: a big feature that needs several fix cycles re-emits far
   more than small slices that pass first try. Lean on roadmap slicing.
@@ -253,6 +254,40 @@ in CLAUDE.md → **Profiles** (`/genesis:sync` adds it to older projects). The
 skills then load only those files, and only for the code at hand: an Angular
 change loads the core plus `client`, never the game or C++ rules.
 
+## Speed: parallel areas, fewer test runs
+Builds were slow because every agent ran one after the other and the full suite
+ran after every fix. Now:
+- **Areas in parallel.** A feature that spans backend, frontend or rules is
+  split into areas around a **contract** (the shared endpoint and type shapes,
+  agreed in the spec and written first). Test-writers, then area-builders, run
+  one per area at the same time; the areas meet at one full-suite run. Tested:
+  two 40-second agents launched together finished in 50 seconds, not 80.
+- **Checks in parallel.** After the build, the e2e-tester, security-reviewer
+  and component-moderator run together.
+- **Three test levels.** While iterating, builders and fixers run only their
+  own tests and those related to the changed files (`jest --findRelatedTests`).
+  Before "done", the **affected** tests and lint run once: everything the change
+  could reach (`nx affected`, `turbo --filter=...[main]`,
+  `jest --changedSince=main`), so a small feature in one project doesn't re-run
+  every project. The whole repo runs only when you ask, or in CI. Affected
+  detection follows imports, so it can miss runtime-only links (config read by
+  name); CI's full run catches those. Re-checks only re-run the checks that found
+  something.
+- **Phase timings** in every build summary, so a slow phase is visible.
+
+Parallel costs about the same tokens (each agent starts fresh either way); it
+just spends them faster, so you can reach your plan's rate limit sooner on a
+heavy day. The shared rules live in `shared/parallel-and-checks.md`, read by
+both build-feature and improve-feature.
+
+## Components that actually get used
+- The plan names the house component for every UI element it adds.
+- The **component-moderator** (Haiku, read-only) checks the built UI against
+  `COMPONENTS.md`: exact swaps go into the fix loop, partial matches come to you.
+- **`/genesis:components guard`** adds a test to your project that fails on a
+  raw element wherever a house component exists, from each component's
+  **Replaces** list. It runs with every test run, so it can't be skipped.
+
 ## Security by design
 Security is part of the first draft, not a later audit:
 1. **Spec:** the interview proposes the Security section (entry points, access,
@@ -276,7 +311,7 @@ to `/genesis:fix` as a failing test.
 
 ## Agents (used by the commands — you don't call these directly)
 test-writer · characterization-tester · perf-profiler · e2e-tester · bug-fixer ·
-security-reviewer.
+security-reviewer · area-builder · component-moderator.
 They read the actual test/lint/benchmark commands from the project's `CLAUDE.md`,
 so the same agents work on any stack. Under the plugin they're namespaced
 `genesis:<name>`.

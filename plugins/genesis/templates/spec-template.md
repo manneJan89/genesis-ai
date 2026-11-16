@@ -77,6 +77,16 @@ Measurable targets, or "none required".
 - **Representative workload**: the input/load the benchmark runs against
 - **Metric**: what's being measured (latency, throughput, memory, allocations…)
 
+## Areas and contract — features spanning more than one area
+Lets the build test and build each area at the same time instead of one after
+another. Omit for single-area features.
+- **Areas**: each area and its folders (e.g. backend `api/`, frontend `web/`,
+  rules `firestore.rules`)
+- **Contract**: what the areas share, defined before either is built: endpoint
+  paths and methods, request and response shapes (field names and types),
+  enums, events. Where it will live (e.g. `shared/contracts/reminders.ts`).
+- **Order**: anything that genuinely must come first; otherwise "parallel".
+
 ## Technical notes / constraints
 Anything the builder must respect: existing modules to reuse, APIs, data shapes,
 security requirements, things NOT to touch.

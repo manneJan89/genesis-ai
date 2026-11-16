@@ -40,7 +40,13 @@ several specs, or the interview keeps expanding in scope), stop and recommend
 
 1. **Interview me to extract the real requirement.** Ask focused questions
    **one at a time** and wait for my answer before the next. Don't dump a
-   questionnaire. Prioritize the questions that most reduce ambiguity:
+   questionnaire. Keep each question short and plain:
+   - at most two sentences, in everyday words;
+   - with your recommended answer and a one-line reason, so I can just say
+     "yes";
+   - explain any term I might not know in a few words in brackets;
+   - never ask what you can find out from the code yourself; look first.
+   Prioritize the questions that most reduce ambiguity:
    - What problem does this solve, and who for?
    - What is explicitly out of scope?
    - What are the concrete acceptance criteria (including edge and error cases)?
@@ -60,6 +66,10 @@ several specs, or the interview keeps expanding in scope), stop and recommend
      state) is a normal criterion.
    - **Scale:** expected volume for any list/query here — does it need pagination,
      and are the filtered/sorted fields indexed?
+   - **Areas and contract (features spanning backend and frontend, or rules):**
+     propose the areas and the contract between them (endpoints, request and
+     response shapes, enums) yourself, and ask me only to confirm. This is what
+     lets the build run the areas in parallel.
    - What existing code/constraints must this respect or avoid touching?
    - **If this feature has UI, run the DESIGN GATE before finalizing the spec.**
      (Skip entirely for backend/database/API/logic — no design needed there.)

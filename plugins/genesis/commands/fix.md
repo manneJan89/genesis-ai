@@ -61,8 +61,9 @@ Run it and confirm it **fails for the expected reason**, not for an unrelated on
 
 - If the test passes, you have not reproduced the bug. **Stop.** Report that the
   bug does not reproduce as described and ask for more detail. Do not fix blind.
-- Also confirm the rest of the suite is green *before* the fix, so you know what
-  the fix is responsible for.
+- Also confirm the affected tests for the files you expect to change are green
+  *before* the fix (known-red ones from the Test baseline aside), so you know
+  what the fix is responsible for.
 
 ## Phase 3 — Fix
 Delegate to the **bug-fixer** subagent with the failing test and your hypothesis.
@@ -85,7 +86,8 @@ my input or more information, not another guess.
 
 ## Phase 4 — Verify
 - The new test now passes.
-- Run the **full suite** (command from CLAUDE.md) — everything else still passes.
+- Run the **affected** tests (command from CLAUDE.md; the full suite only if
+  there's none) — everything the fix could reach still passes.
   A fix that breaks another test is not done.
 - Confirm the original reproduction steps no longer produce the symptom.
 
@@ -102,7 +104,7 @@ so, only when the change touched none of these.
    edit.
 2. For each finding scored 70 or above: the **test-writer** turns its "failing
    test that would prove it" into a real test, you confirm it fails, then the
-   **bug-fixer** fixes it and the full suite runs.
+   **bug-fixer** fixes it and the affected tests run.
 3. **Cap at 2 rounds.** Anything critical or high still open after that blocks
    `done`: stop and report it, don't ship around it. Medium and low go to
    `FINDINGS.md` with the reviewer's details.
@@ -118,7 +120,7 @@ the shared logic — propose it, don't do it unilaterally).
 
 ## Phase 6 — Summary
 Report: the root cause in one or two sentences, exactly what changed, the test
-that now guards it, full suite results, and any related issues found in Phase 5.
+that now guards it, affected test results, and any related issues found in Phase 5.
 Note anything you deliberately left alone.
 
 If the work is finished, clear `HANDOFF.md` as described under Handoff. If it

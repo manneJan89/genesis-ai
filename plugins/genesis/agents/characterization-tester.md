@@ -33,12 +33,14 @@ run a seed, reset, migrate or data-fix script to see what it does; read it.
    note, don't assert the buggy output.
 4. Match the project's test framework and layout (read the Commands, Conventions,
    and Codebase map sections of CLAUDE.md; confirm against the repo).
-5. Run the tests and confirm they pass against the current code — a
-   characterization test that fails on unchanged code is wrong.
+5. Run the tests you wrote (single-file or related command) and confirm they
+   pass against the current code — a characterization test that fails on
+   unchanged code is wrong. If you were given an area, stay in its folders:
+   other characterization-testers may be covering the other areas in parallel.
 
 Do **not** modify implementation code — only test files.
 
-Report back:
+Report back, in a few lines:
 - Which Keep behaviors are now covered
 - Anything you couldn't pin down (nondeterminism, hidden side effects, external
   calls) and how you handled it
