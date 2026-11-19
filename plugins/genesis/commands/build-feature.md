@@ -158,10 +158,12 @@ Build as **Areas and the contract → Building per area** describes: yourself
 for one area, parallel **area-builder** subagents for several, then the join
 (affected tests and lint once).
 
-**Don't edit a test to make it pass.** If a test looks wrong (it contradicts the
-spec, or asserts something the spec never said), stop and show me the test, the
-criterion, and why you think it's wrong. The test or the spec changes only with my
-say-so.
+**Don't edit a new test to make it pass.** If a Phase 3 test looks wrong (it
+contradicts the spec, or asserts something the spec never said), stop and show me
+the test, the criterion, and why you think it's wrong. The test or the spec
+changes only with my say-so. **Existing tests** that fail because of this change
+follow CLAUDE.md's "trace each one, then act": updated without asking when the
+failure traces to a change in the spec, the code fixed when it doesn't.
 
 ## Phase 5 — Checks, in parallel
 Follow **Checks, in parallel** in the shared file: e2e-tester, security-reviewer
@@ -215,6 +217,7 @@ Short. A few lines, in this shape, and nothing else unless something needs me:
 
     Built: <one line>
     Tests: <passed>/<total> (<n> new, <n> of them security); affected tests green (<n> projects)
+    Updated: <n> existing tests to the spec's changes (test → spec line, one per line), or "none"
     Checks: security <clean | n fixed | skipped: why>, components <clean | n swapped>
     Time: plan <m>, tests <m>, build <m>, checks <m>, fixes <m>
     Needs you: <(manual) criteria to check, partial component matches, open items; or "nothing">

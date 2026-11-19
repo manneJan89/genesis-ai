@@ -41,7 +41,9 @@ the contract files. Frontend tests mock the backend through the contract.
   file, stop the affected area, settle it with me, update the contract yourself,
   and restart only the areas it affects.
 - **Join:** when every area is green, run the **affected** tests and lint once
-  (CLAUDE.md "affected" commands; the full suite only if the stack has none). This is where the areas meet: a mismatch between
+  (CLAUDE.md "affected" commands; the full suite only if the stack has none).
+  Existing tests that fail here follow CLAUDE.md's "trace each one, then act":
+  update the ones that trace to a change in the spec, fix the code for the rest. This is where the areas meet: a mismatch between
   frontend and backend shows up here.
 
 ## Checks, in parallel

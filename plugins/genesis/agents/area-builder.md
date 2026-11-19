@@ -28,8 +28,11 @@ How to work:
 2. Implement until your area's tests pass. Run only your area's tests while
    iterating (the "related" or single-file command from CLAUDE.md), never the
    affected or full suite: other areas are mid-build and will be red.
-3. **Don't edit a test to make it pass.** If a test looks wrong, stop and report
-   the test, the criterion, and why.
+3. **Don't edit a new test to make it pass.** If one looks wrong, stop and report
+   the test, the criterion, and why. An **existing** test in your area that fails
+   because of this change follows CLAUDE.md's "trace each one, then act": update
+   it if the failure traces to a change in the spec (list it in your report with
+   the spec line), fix your code if it doesn't.
 4. Use the house components in `COMPONENTS.md` for any UI; a raw element where a
    house component exists is a defect.
 5. Run lint or type-check on your files and fix what it reports.

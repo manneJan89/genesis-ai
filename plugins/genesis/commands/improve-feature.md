@@ -110,8 +110,13 @@ other code intact** (per the modification contract in Standards).
 - **Change type = extend / bugfix:** the behaviors tagged **Change** or **Wrong**
   will make their characterization tests fail — that's expected. Update those
   specific tests to the new target behavior; the Keep tests must still pass.
+- **Older tests from earlier specs** that now fail follow CLAUDE.md's "trace
+  each one, then act": updated without asking when the failure traces to a
+  change this spec makes, the code fixed when it doesn't, and only a genuinely
+  unclear one comes to me.
 
-Make the Phase 3 tests pass without editing them. If one looks wrong, stop and
+Make the Phase 3 tests pass without editing them (new tests are never edited to
+pass). If one looks wrong, stop and
 show me rather than bending it. Run the lint/type-check command before moving on.
 
 ## Phase 5 — Checks, in parallel
@@ -164,6 +169,7 @@ Short. A few lines, in this shape, and nothing else unless something needs me:
 
     Changed: <one line>
     Tests: <passed>/<total>; Keep net green; <n> characterization tests updated (Change/Wrong)
+    Updated: <n> older tests to the spec's changes (test → spec line, one per line), or "none"
     Checks: security <clean | n fixed | skipped: why>, components <clean | n swapped>, design <matched | n fixed | not applied>
     Time: net <m>, plan <m>, tests <m>, build <m>, checks <m>, fixes <m>
     Needs you: <(manual) criteria, partial component matches, open items; or "nothing">
