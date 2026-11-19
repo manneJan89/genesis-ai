@@ -50,6 +50,7 @@ Start from what you're trying to do:
 | Find out what's wrong (don't know yet) | `/genesis:review <thing>` | A ranked list of real defects, perf hypotheses, and standards violations — each routed to the right command |
 | Turn a handed design into editable HTML | `/genesis:design <screen>` | A human-editable `design/<screen>.html` you can tweak directly |
 | Replace a screen/component's look (keep behavior) | `/genesis:redesign <unit>` | New design approved, then UI replaced with behavior held constant |
+| New look AND new behaviour for a screen | `/genesis:design <screen>` → `/genesis:spec` (pointing at the design) → `/genesis:improve-feature` | One run builds both; the approved design is the only UI source |
 | See/manage which shared components to use | `/genesis:components` | The house-component registry; scan to seed it |
 | See / work out-of-scope issues found during other work | `/genesis:findings` | The backlog, ranked; or route one to its fix flow |
 | Audit security across the app | `/genesis:security-check [scope]` | Attacker's-eye, checklist-driven vulnerability report routed to `/genesis:fix` |
