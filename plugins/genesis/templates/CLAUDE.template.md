@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- genesis-standards-version: 0.27.1 — run /genesis:sync after a plugin update to refresh these rules -->
+<!-- genesis-standards-version: 0.27.3 — run /genesis:sync after a plugin update to refresh these rules -->
 
 Keep this file lean. It loads into every session **and** every subagent, so it's
 the one place to encode rules the whole pipeline obeys.
@@ -42,6 +42,18 @@ Don't write implementation code for a feature until an approved spec exists in `
 - Tests are derived from the spec's acceptance criteria, not from whatever the
   implementation happens to do. If code and spec disagree, the spec wins and the
   discrepancy gets flagged.
+- **New tests written for this spec are never edited to make them pass.** If one
+  looks wrong, stop and show me.
+- **Existing tests that fail after a change: trace each one, then act.**
+  - **It pins behaviour the spec changes on purpose** (a rule the spec adds,
+    removes or changes, or a behaviour tagged Change/Wrong): update it to the new
+    rule without asking. Change only the assertion that rule affects, keep every
+    other assertion as strong as it was, and don't delete a test whose other
+    checks still hold. List each updated test with the spec line it traces to.
+  - **It doesn't trace to the spec:** it's a regression. Fix the code, not the
+    test.
+  - **You can't tell:** ask me, once, with the test, the failure, and both
+    readings.
 - **Test happy AND unhappy paths — always, even when the spec omits the unhappy
   one.** For every operation: success and failure. For every async/loading flow:
   state resets on both branches (the never-unset `loading` bug). For every
