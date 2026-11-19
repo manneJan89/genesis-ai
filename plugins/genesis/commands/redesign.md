@@ -75,8 +75,13 @@ code.** Design precedes build, like a designer handing off.
 - Delegate to the **characterization-tester** to net the target's **behavior**
   (what it does), so you can prove the redesign didn't break function. Confirm green
   before changing anything.
-- Enter plan mode; state the touch budget (the template + styles you'll change).
-  Approve, then replace the visuals: implement the approved design in the
+- Enter plan mode; state the touch budget (the template + styles you'll change)
+  and list **every edit to the backing class or controller**, one line each with
+  the reason. A redesign should need almost none: any change to how a value is
+  computed, or to what gets passed into a binding, is a behaviour change, and
+  recreating values in a getter or template for convenience is not allowed (it
+  caused change-detection hangs; see the Angular performance rules). Approve,
+  then replace the visuals: implement the approved design in the
   **project's styling system** (Tailwind/Bootstrap/theme + house components from
   `COMPONENTS.md`) — do NOT copy the design file's raw CSS, and do NOT change
   behavior, data flow, or logic. Restyle every state from the Phase 1 list. Minor
@@ -96,8 +101,11 @@ code.** Design precedes build, like a designer handing off.
 ## Phase 6 — Log new features, don't build them
 If the new design implies functionality that doesn't exist yet (a new filter, a new
 action, a field that isn't wired), **log it to `FINDINGS.md`** as a new feature to
-spec separately — do NOT build it here. Redesign changes the look only; new
-behavior goes through `/genesis:spec`. Tell me what you logged.
+spec separately — do NOT build it here. Redesign changes the look only. If you'd
+rather build the new look and the new behaviour together, that's
+`/genesis:spec` for the new behaviour (pointing at this design) and then
+`/genesis:improve-feature`, which applies an approved design and new behaviour in
+one run. Tell me what you logged.
 
 ## Phase 7 — Asset gate + summary
 - If the design needs an icon/image asset that wasn't provided, finish what you can

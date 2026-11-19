@@ -38,7 +38,10 @@ ends. Format: `${CLAUDE_PLUGIN_ROOT}/templates/HANDOFF.template.md`.
 ## Phase 1 — Safety net (before touching anything)
 Delegate to the **characterization-tester** subagent to lock in every behavior
 tagged **Keep** in the spec (one per area, in parallel, when the code spans
-areas). Confirm the whole net is green against the current,
+areas). If this run applies a new design (see Phase 4), the net pins
+**behaviour, not markup**: what the screen does and shows, not its element
+structure or classes, which are being replaced. Confirm the whole net is green
+against the current,
 unchanged code before proceeding. This is the step that makes the change safe —
 do not skip it.
 
@@ -49,8 +52,22 @@ target acceptance criteria, and — for a refactor — your assurance that the
 characterization tests stay green throughout. Everything not on that list stays
 untouched. If the change spans areas (backend, frontend, rules), split it as
 **Areas and the contract** describes. For new UI, name the `COMPONENTS.md`
-component each element will use. Stop for my approval of the touch budget before
-writing. Prefer small reviewable chunks over one big pass.
+component each element will use.
+
+**If this run applies a new design** (the spec points at an approved design in
+`design/`), the plan also lists:
+- the **render states** the screen has (loading, empty, error, populated,
+  permission-gated, list item variants), each mapped to the part of the design
+  that covers it; a state the design doesn't cover is a question for me, not a
+  guess;
+- **every edit to the backing class or controller**, one line each: what changes
+  and why. A redesign should need few; any change to how a value is computed,
+  or to what gets passed into a binding, is a behaviour change and must trace to
+  an acceptance criterion. Recreating values in a getter or template for
+  convenience is not allowed (see the Angular performance rules).
+
+Stop for my approval of the touch budget before writing. Prefer small reviewable
+chunks over one big pass.
 
 **Data operations:** if the plan includes anything that writes to data outside a
 local or emulator database (migration, backfill, bulk update or delete, data-fix
@@ -72,19 +89,21 @@ sit alongside the characterization net, which must still be green.
 Load the Genesis standards skills that apply (see CLAUDE.md → Standards), then
 implement the approved plan: yourself for one area, parallel **area-builder**
 subagents for several, then the join (see **Building per area**). **Modify only what the touch budget names; leave all
-other code — and all existing UI/design — byte-for-byte intact** (per the
-modification contract in Standards). Do not restyle or re-lay-out an existing
-screen. If integrating data into an existing page, wire the data *into* the
-existing widgets — do not rebuild the page.
+other code intact** (per the modification contract in Standards).
 
-> **Design is a Keep here.** `improve-feature` changes behavior and preserves the
-> existing look. If this task is actually a *redesign* (replacing the layout/visuals
-> of an existing screen or component), STOP and tell me to use `/genesis:redesign`
-> — that command keeps behavior and changes design, the inverse of this one. Don't
-> restyle from within improve-feature. If the feature adds NEW UI to an existing
-> screen and its design gate wasn't resolved in the spec, stop and settle it (a
-> design in `design/`, or an approved "assume") before building that UI — don't
-> improvise a look.
+**The look: keep it, unless an approved design replaces it.**
+- **No approved design for the screen:** the existing look is a Keep. Don't
+  restyle or re-lay-out it; wire new data *into* the existing widgets. New UI on
+  an existing screen needs its design gate settled first (a design in
+  `design/`, or an approved "assume"); never improvise a look.
+- **The spec points at an approved design in `design/`:** build the new look and
+  the new behaviour together in this run, without asking. Implement the design in
+  the project's styling system and house components (`COMPONENTS.md`), never by
+  copying the design file's raw CSS, and style every render state from the plan.
+  The approved design is the only UI source: anything it doesn't show stays as
+  it is or comes to me.
+- **Look only, behaviour unchanged:** that's `/genesis:redesign`, not this
+  command.
 - **Change type = refactor:** the characterization net must stay green the entire
   time; run the related part of it after each step. Green net = behavior
   preserved.
@@ -100,6 +119,13 @@ Follow **Checks, in parallel** in the shared file: e2e-tester (including the
 untouched characterization tests, which guard against regressions),
 security-reviewer (when the change touches the trust boundary) and
 component-moderator (when it touched UI), launched together.
+
+**Design check (only if this run applied a new design):** after the checks,
+walk the built screen against the design file, element by element and state by
+state (every render state from the plan): each element present, using the right
+house component, in the right place, with the design's content and states. List
+mismatches as defects for the fix loop. Minor pixel drift from existing project
+styles is fine.
 
 ## Phase 6 — Fix loop
 Follow **Fix loop** in the shared file. The Keep characterization tests must be
@@ -138,7 +164,7 @@ Short. A few lines, in this shape, and nothing else unless something needs me:
 
     Changed: <one line>
     Tests: <passed>/<total>; Keep net green; <n> characterization tests updated (Change/Wrong)
-    Checks: security <clean | n fixed | skipped: why>, components <clean | n swapped>
+    Checks: security <clean | n fixed | skipped: why>, components <clean | n swapped>, design <matched | n fixed | not applied>
     Time: net <m>, plan <m>, tests <m>, build <m>, checks <m>, fixes <m>
     Needs you: <(manual) criteria, partial component matches, open items; or "nothing">
 
